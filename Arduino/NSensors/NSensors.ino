@@ -7,7 +7,7 @@
 #define LED_PIN         2
 #define LED_TYPE        WS2812
 #define MAX_DIST        2000
-#define NB_SENSORS      2
+#define NB_SENSORS      6
 #define REFRESH         100
 #define SENSOR_ADDR     0x52
 
@@ -27,21 +27,22 @@ void setup() {
   Wire.begin();
 
   // Init xshut pins
-  for (int i = 1; i < NB_SENSORS; i++) {
-    pinMode(i + 2, OUTPUT);
-    digitalWrite(i + 2, LOW);
+  for (int i = 0; i < NB_SENSORS; i++) {
+    pinMode(i + 3, OUTPUT);
+    digitalWrite(i + 3, LOW);
   }
 
   // Init sensors
-  for (int i = NB_SENSORS -1; i > 0; i--) {
-    digitalWrite(i + 2, HIGH);
+  for (int i = NB_SENSORS -1; i >= 0; i--) {
+    digitalWrite(i + 3, HIGH);
     init_sensor(i);
   }
-  init_sensor(0);
 
 }
 
 void init_sensor(int i) {
+  Serial.print("Init sensor nb: ");
+  Serial.println(i + 1);
   sensors[i].init();
   sensors[i].setTimeout(500);
   sensors[i].setAddress(SENSOR_ADDR + i);
@@ -55,7 +56,7 @@ void loop() {
 
   for (int i = 0; i < NB_SENSORS; i++) {
     Serial.print("Sensor nb : ");
-    Serial.print(i);
+    Serial.print(i + 1);
     Serial.print(" dist :");
 
     int dist = sensors[i].readRangeSingleMillimeters();
