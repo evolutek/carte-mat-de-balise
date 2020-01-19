@@ -3,10 +3,10 @@
 <eagle version="9.5.2">
 <drawing>
 <settings>
-<setting alwaysvectorfont="yes"/>
+<setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -73,9 +73,9 @@
 </layers>
 <schematic xreflabel="%F%N/%S.%C%R" xrefpart="/%S.%C%R">
 <libraries>
-<library name="LibBeaconMat">
+<library name="LibBeaconMat" urn="urn:adsk.eagle:library:16498234">
 <packages>
-<package name="B06B-PASK" urn="urn:adsk.eagle:footprint:11903778/1" library_version="1" library_locally_modified="yes">
+<package name="B06B-PASK" urn="urn:adsk.eagle:footprint:11903778/3" library_version="3">
 <pad name="P$1" x="5" y="0" drill="0.7" shape="square"/>
 <pad name="P$2" x="3" y="0" drill="0.7" shape="square"/>
 <pad name="P$3" x="1" y="0" drill="0.7" shape="square"/>
@@ -90,7 +90,7 @@
 <wire x1="7" y1="2.15" x2="7" y2="-3.15" width="0.127" layer="51"/>
 <wire x1="-7" y1="-3.15" x2="-7" y2="2.15" width="0.127" layer="51"/>
 </package>
-<package name="B05B-PASK" urn="urn:adsk.eagle:footprint:11903780/1" library_version="1" library_locally_modified="yes">
+<package name="B05B-PASK" urn="urn:adsk.eagle:footprint:11903780/3" library_version="3">
 <pad name="P$1" x="4" y="0" drill="0.7" shape="square"/>
 <pad name="P$2" x="2" y="0" drill="0.7" shape="square"/>
 <pad name="P$3" x="0" y="0" drill="0.7" shape="square"/>
@@ -104,7 +104,7 @@
 <wire x1="6" y1="2.15" x2="6" y2="-3.15" width="0.127" layer="51"/>
 <wire x1="-6" y1="-3.15" x2="-6" y2="2.15" width="0.127" layer="51"/>
 </package>
-<package name="DIP787W45P254L3556H508Q28">
+<package name="DIP787W45P254L3556H508Q28" urn="urn:adsk.eagle:footprint:16498235/1" library_version="1">
 <wire x1="3.75" y1="17.78" x2="-3.75" y2="17.78" width="0.127" layer="51"/>
 <wire x1="-3.75" y1="17.78" x2="-3.75" y2="-17.78" width="0.127" layer="51"/>
 <wire x1="-3.75" y1="-17.78" x2="3.75" y2="-17.78" width="0.127" layer="51"/>
@@ -115,14 +115,14 @@
 <wire x1="3.75" y1="17.78" x2="3.75" y2="17.526" width="0.127" layer="21"/>
 <wire x1="-3.75" y1="-17.78" x2="-3.75" y2="-17.526" width="0.127" layer="21"/>
 <wire x1="3.75" y1="-17.78" x2="3.75" y2="-17.526" width="0.127" layer="21"/>
-<circle x="-5.71441875" y="16.5443" radius="0.1" width="0.2" layer="21"/>
 <wire x1="4.8" y1="18.03" x2="-4.8" y2="18.03" width="0.05" layer="39"/>
 <wire x1="-4.8" y1="18.03" x2="-4.8" y2="-18.03" width="0.05" layer="39"/>
 <wire x1="-4.8" y1="-18.03" x2="4.8" y2="-18.03" width="0.05" layer="39"/>
 <wire x1="4.8" y1="-18.03" x2="4.8" y2="18.03" width="0.05" layer="39"/>
+<circle x="-5.71441875" y="16.5443" radius="0.1" width="0.2" layer="21"/>
+<circle x="-5.71441875" y="16.5443" radius="0.1" width="0.2" layer="51"/>
 <text x="-4.76866875" y="18.4386" size="1.781040625" layer="25">&gt;NAME</text>
 <text x="-4.94563125" y="-20.1171" size="1.78091875" layer="27">&gt;VALUE</text>
-<circle x="-5.71441875" y="16.5443" radius="0.1" width="0.2" layer="51"/>
 <pad name="1" x="-3.935" y="16.51" drill="0.82" diameter="1.23" shape="square"/>
 <pad name="2" x="-3.935" y="13.97" drill="0.82" diameter="1.23"/>
 <pad name="3" x="-3.935" y="11.43" drill="0.82" diameter="1.23"/>
@@ -154,14 +154,19 @@
 </package>
 </packages>
 <packages3d>
-<package3d name="B06B-PASK" urn="urn:adsk.eagle:package:11903788/3" type="model" library_version="1" library_locally_modified="yes">
+<package3d name="B06B-PASK" urn="urn:adsk.eagle:package:11903788/5" type="model" library_version="3">
 <packageinstances>
 <packageinstance name="B06B-PASK"/>
 </packageinstances>
 </package3d>
-<package3d name="B05B-PASK" urn="urn:adsk.eagle:package:11903790/3" type="model" library_version="1" library_locally_modified="yes">
+<package3d name="B05B-PASK" urn="urn:adsk.eagle:package:11903790/5" type="model" library_version="3">
 <packageinstances>
 <packageinstance name="B05B-PASK"/>
+</packageinstances>
+</package3d>
+<package3d name="DIP787W45P254L3556H508Q28" urn="urn:adsk.eagle:package:16498237/2" type="model" library_version="3">
+<packageinstances>
+<packageinstance name="DIP787W45P254L3556H508Q28"/>
 </packageinstances>
 </package3d>
 </packages3d>
@@ -193,7 +198,7 @@
 <text x="-5.08" y="-5.08" size="1.778" layer="95">&gt;NAME</text>
 <text x="-5.08" y="-7.62" size="1.778" layer="96">&gt;VALUE</text>
 </symbol>
-<symbol name="MCP23017-E/SP">
+<symbol name="MCP23017-E/SP" urn="urn:adsk.eagle:symbol:16498236/1" library_version="1">
 <wire x1="10.16" y1="27.94" x2="10.16" y2="-27.94" width="0.254" layer="94"/>
 <wire x1="10.16" y1="-27.94" x2="-10.16" y2="-27.94" width="0.254" layer="94"/>
 <wire x1="-10.16" y1="-27.94" x2="-10.16" y2="27.94" width="0.254" layer="94"/>
@@ -229,7 +234,7 @@
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="JST6" urn="urn:adsk.eagle:component:11903793/1" locally_modified="yes" prefix="J" library_version="1" library_locally_modified="yes">
+<deviceset name="JST6" urn="urn:adsk.eagle:component:11903793/3" prefix="J" library_version="3">
 <gates>
 <gate name="G$1" symbol="JST6" x="0" y="0"/>
 </gates>
@@ -244,7 +249,7 @@
 <connect gate="G$1" pin="6" pad="P$6"/>
 </connects>
 <package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 </package3dinstances>
 <technologies>
 <technology name=""/>
@@ -252,7 +257,7 @@
 </device>
 </devices>
 </deviceset>
-<deviceset name="JST5" urn="urn:adsk.eagle:component:11903795/1" locally_modified="yes" prefix="J" library_version="1" library_locally_modified="yes">
+<deviceset name="JST5" urn="urn:adsk.eagle:component:11903795/3" prefix="J" library_version="3">
 <gates>
 <gate name="G$1" symbol="JST5" x="0" y="0"/>
 </gates>
@@ -266,7 +271,7 @@
 <connect gate="G$1" pin="5" pad="P$5"/>
 </connects>
 <package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:11903790/3"/>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:11903790/5"/>
 </package3dinstances>
 <technologies>
 <technology name=""/>
@@ -274,7 +279,7 @@
 </device>
 </devices>
 </deviceset>
-<deviceset name="MCP23017-E/SP" prefix="U">
+<deviceset name="MCP23017-E/SP" urn="urn:adsk.eagle:component:16498238/2" prefix="U" library_version="3">
 <description>MCP23017 Series 5.5 V 1.7 MHz SMT 16-Bit I2C I/O Expander - SPDIP-28</description>
 <gates>
 <gate name="G$1" symbol="MCP23017-E/SP" x="0" y="0"/>
@@ -309,6 +314,9 @@
 <connect gate="G$1" pin="VDD" pad="9"/>
 <connect gate="G$1" pin="VSS" pad="10"/>
 </connects>
+<package3dinstances>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:16498237/2"/>
+</package3dinstances>
 <technologies>
 <technology name="">
 <attribute name="AVAILABILITY" value="Unavailable"/>
@@ -7081,6 +7089,67 @@ DIN A4, landscape with location and doc. field</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="wirepad" urn="urn:adsk.eagle:library:412">
+<description>&lt;b&gt;Single Pads&lt;/b&gt;&lt;p&gt;
+&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
+<packages>
+<package name="2,54/1,0" urn="urn:adsk.eagle:footprint:30810/1" library_version="2">
+<description>&lt;b&gt;THROUGH-HOLE PAD&lt;/b&gt;</description>
+<wire x1="1.27" y1="1.27" x2="1.27" y2="0.762" width="0.1524" layer="21"/>
+<wire x1="1.27" y1="1.27" x2="0.762" y2="1.27" width="0.1524" layer="21"/>
+<wire x1="-1.27" y1="1.27" x2="-0.762" y2="1.27" width="0.1524" layer="21"/>
+<wire x1="-1.27" y1="1.27" x2="-1.27" y2="0.762" width="0.1524" layer="21"/>
+<wire x1="-1.27" y1="-1.27" x2="-1.27" y2="-0.762" width="0.1524" layer="21"/>
+<wire x1="-1.27" y1="-1.27" x2="-0.762" y2="-1.27" width="0.1524" layer="21"/>
+<wire x1="0.762" y1="-1.27" x2="1.27" y2="-1.27" width="0.1524" layer="21"/>
+<wire x1="1.27" y1="-1.27" x2="1.27" y2="-0.762" width="0.1524" layer="21"/>
+<circle x="0" y="0" radius="1.016" width="0.1524" layer="51"/>
+<pad name="1" x="0" y="0" drill="1.016" diameter="2.54" shape="octagon"/>
+<text x="-1.27" y="1.524" size="1.27" layer="25" ratio="10">&gt;NAME</text>
+<text x="0" y="1" size="0.0254" layer="27">&gt;VALUE</text>
+</package>
+</packages>
+<packages3d>
+<package3d name="2,54/1,0" urn="urn:adsk.eagle:package:30828/1" type="box" library_version="2">
+<description>THROUGH-HOLE PAD</description>
+<packageinstances>
+<packageinstance name="2,54/1,0"/>
+</packageinstances>
+</package3d>
+</packages3d>
+<symbols>
+<symbol name="PAD" urn="urn:adsk.eagle:symbol:30808/1" library_version="2">
+<wire x1="-1.016" y1="1.016" x2="1.016" y2="-1.016" width="0.254" layer="94"/>
+<wire x1="-1.016" y1="-1.016" x2="1.016" y2="1.016" width="0.254" layer="94"/>
+<text x="-1.143" y="1.8542" size="1.778" layer="95">&gt;NAME</text>
+<text x="-1.143" y="-3.302" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="P" x="2.54" y="0" visible="off" length="short" direction="pas" rot="R180"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="2,54/1,0" urn="urn:adsk.eagle:component:30846/2" prefix="PAD" uservalue="yes" library_version="2">
+<description>&lt;b&gt;THROUGH-HOLE PAD&lt;/b&gt;</description>
+<gates>
+<gate name="P" symbol="PAD" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="2,54/1,0">
+<connects>
+<connect gate="P" pin="P" pad="1"/>
+</connects>
+<package3dinstances>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:30828/1"/>
+</package3dinstances>
+<technologies>
+<technology name="">
+<attribute name="POPULARITY" value="1" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -7102,37 +7171,37 @@ DIN A4, landscape with location and doc. field</description>
 <part name="R4" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="10k"/>
 <part name="R5" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="10k"/>
 <part name="FRAME1" library="frames" library_urn="urn:adsk.eagle:library:229" deviceset="A4L-LOC" device=""/>
-<part name="S1" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S1" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY5" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S2" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S2" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY2" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S3" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S3" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY8" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S4" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S4" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY11" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S5" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S5" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY14" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S6" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S6" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY17" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S7" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S7" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY20" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S8" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S8" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY23" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S9" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S9" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY26" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S10" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S10" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY29" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S11" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S11" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY32" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S12" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S12" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY35" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S13" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S13" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY44" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S14" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S14" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY47" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S15" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S15" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY50" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
-<part name="S16" library="LibBeaconMat" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/3"/>
+<part name="S16" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST6" device="" package3d_urn="urn:adsk.eagle:package:11903788/5"/>
 <part name="SUPPLY53" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="SUPPLY1" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="VCC" device=""/>
 <part name="SUPPLY3" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="VCC" device=""/>
@@ -7152,7 +7221,7 @@ DIN A4, landscape with location and doc. field</description>
 <part name="SUPPLY24" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="VCC" device=""/>
 <part name="SUPPLY25" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="VCC" device=""/>
 <part name="SUPPLY28" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="VCC" device=""/>
-<part name="J1" library="LibBeaconMat" deviceset="JST5" device="" package3d_urn="urn:adsk.eagle:package:11903790/3"/>
+<part name="J1" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="JST5" device="" package3d_urn="urn:adsk.eagle:package:11903790/5"/>
 <part name="SUPPLY31" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="VCC" device=""/>
 <part name="SUPPLY33" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="VCC" device=""/>
 <part name="SW1" library="special" library_urn="urn:adsk.eagle:library:367" deviceset="SW_DIP-3" device="" package3d_urn="urn:adsk.eagle:package:26663/2"/>
@@ -7163,8 +7232,8 @@ DIN A4, landscape with location and doc. field</description>
 <part name="SUPPLY36" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="SUPPLY39" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="SUPPLY40" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="VCC" device=""/>
-<part name="U1" library="LibBeaconMat" deviceset="MCP23017-E/SP" device=""/>
-<part name="U2" library="LibBeaconMat" deviceset="MCP23017-E/SP" device=""/>
+<part name="U1" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="MCP23017-E/SP" device="" package3d_urn="urn:adsk.eagle:package:16498237/2"/>
+<part name="U2" library="LibBeaconMat" library_urn="urn:adsk.eagle:library:16498234" deviceset="MCP23017-E/SP" device="" package3d_urn="urn:adsk.eagle:package:16498237/2"/>
 <part name="SW2" library="special" library_urn="urn:adsk.eagle:library:367" deviceset="SW_DIP-3" device="" package3d_urn="urn:adsk.eagle:package:26663/2"/>
 <part name="R6" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="10k"/>
 <part name="R7" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" package3d_urn="urn:adsk.eagle:package:23555/3" value="10k"/>
@@ -7173,6 +7242,8 @@ DIN A4, landscape with location and doc. field</description>
 <part name="SUPPLY30" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="SUPPLY41" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="SUPPLY42" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="VCC" device=""/>
+<part name="RESET2" library="wirepad" library_urn="urn:adsk.eagle:library:412" deviceset="2,54/1,0" device="" package3d_urn="urn:adsk.eagle:package:30828/1" override_package3d_urn="urn:adsk.eagle:package:16498393/2" override_package_urn="urn:adsk.eagle:footprint:30810/1"/>
+<part name="RESET1" library="wirepad" library_urn="urn:adsk.eagle:library:412" deviceset="2,54/1,0" device="" package3d_urn="urn:adsk.eagle:package:30828/1" override_package3d_urn="urn:adsk.eagle:package:16498394/2" override_package_urn="urn:adsk.eagle:footprint:30810/1"/>
 </parts>
 <sheets>
 <sheet>
@@ -7461,6 +7532,14 @@ DIN A4, landscape with location and doc. field</description>
 </instance>
 <instance part="SUPPLY42" gate="G$1" x="78.74" y="152.4" smashed="yes" rot="R90">
 <attribute name="VALUE" x="75.565" y="150.495" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="RESET2" gate="P" x="83.82" y="111.76" smashed="yes">
+<attribute name="NAME" x="82.677" y="113.6142" size="1.778" layer="95"/>
+<attribute name="VALUE" x="82.677" y="108.458" size="1.778" layer="96"/>
+</instance>
+<instance part="RESET1" gate="P" x="17.78" y="111.76" smashed="yes">
+<attribute name="NAME" x="16.637" y="113.6142" size="1.778" layer="95"/>
+<attribute name="VALUE" x="16.637" y="108.458" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -8372,18 +8451,6 @@ DIN A4, landscape with location and doc. field</description>
 <wire x1="53.34" y1="106.68" x2="55.88" y2="106.68" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="RESET" class="0">
-<segment>
-<pinref part="U1" gate="G$1" pin="!RESET"/>
-<wire x1="22.86" y1="111.76" x2="20.32" y2="111.76" width="0.1524" layer="91"/>
-<label x="12.7" y="111.76" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="U2" gate="G$1" pin="!RESET"/>
-<wire x1="88.9" y1="111.76" x2="86.36" y2="111.76" width="0.1524" layer="91"/>
-<label x="78.74" y="111.76" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="N$46" class="0">
 <segment>
 <pinref part="U2" gate="G$1" pin="INTB"/>
@@ -8437,6 +8504,20 @@ DIN A4, landscape with location and doc. field</description>
 <label x="7.62" y="93.98" size="1.778" layer="95"/>
 </segment>
 </net>
+<net name="N$1" class="0">
+<segment>
+<pinref part="U2" gate="G$1" pin="!RESET"/>
+<pinref part="RESET2" gate="P" pin="P"/>
+<wire x1="86.36" y1="111.76" x2="88.9" y2="111.76" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$2" class="0">
+<segment>
+<pinref part="U1" gate="G$1" pin="!RESET"/>
+<pinref part="RESET1" gate="P" pin="P"/>
+<wire x1="20.32" y1="111.76" x2="22.86" y2="111.76" width="0.1524" layer="91"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>
@@ -8457,6 +8538,11 @@ will not be understood (or retained) with this version.
 Since Version 8.3, EAGLE supports the association of 3D packages
 with devices in libraries, schematics, and board files. Those 3D
 packages will not be understood (or retained) with this version.
+</note>
+<note version="9.4" severity="warning">
+Since Version 9.4, EAGLE supports the overriding of 3D packages
+in schematics and board files. Those overridden 3d packages
+will not be understood (or retained) with this version.
 </note>
 <note version="8.4" severity="warning">
 Since Version 8.4, EAGLE supports properties for SPICE simulation. 
