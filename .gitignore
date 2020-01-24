@@ -16,6 +16,9 @@
 # comment the following line if you want to have your project file included.
 eagle.epf
 
+# Import bmp file
+*.scr
+
 # Autorouter files
 *.pro
 *.job
