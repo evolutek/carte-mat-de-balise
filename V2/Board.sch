@@ -3,7 +3,7 @@
 <eagle version="9.5.2">
 <drawing>
 <settings>
-<setting alwaysvectorfont="yes"/>
+<setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
@@ -7159,6 +7159,8 @@ DIN A4, landscape with location and doc. field</description>
 <classes>
 <class number="0" name="default" width="0" drill="0">
 </class>
+<class number="1" name="VCC" width="0.508" drill="0">
+</class>
 </classes>
 <groups>
 <schematic_group name="LOGO"/>
@@ -12245,7 +12247,7 @@ DIN A4, landscape with location and doc. field</description>
 <label x="10.16" y="81.28" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="VCC" class="0">
+<net name="VCC" class="1">
 <segment>
 <pinref part="S13" gate="G$1" pin="1"/>
 <pinref part="SUPPLY3" gate="G$1" pin="VCC"/>
@@ -12489,10 +12491,6 @@ DIN A4, landscape with location and doc. field</description>
 <approved hash="113,1,76.5217,44.45,SCL,,,,,"/>
 <approved hash="113,1,61.2817,44.45,VCC,,,,,"/>
 <approved hash="113,1,130.071,89.431,FRAME1,,,,,"/>
-<approved hash="113,1,20.32,148.364,SW1,,,,,"/>
-<approved hash="113,1,88.9,148.364,SW2,,,,,"/>
-<approved hash="113,1,86.4427,113.027,RESET2,,,,,"/>
-<approved hash="113,1,20.4027,113.027,RESET1,,,,,"/>
 </errors>
 </schematic>
 </drawing>
