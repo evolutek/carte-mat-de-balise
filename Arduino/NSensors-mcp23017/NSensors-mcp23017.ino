@@ -7,13 +7,13 @@
 #define COLOR_ORDER     RGB
 #define LED_PIN         2
 #define LED_TYPE        WS2812
-#define MAX_DIST        2000
-#define NB_SENSORS      7
+#define MAX_DIST        1000
+#define NB_SENSORS      16
 #define REFRESH         0
 #define SENSOR_ADDR     0x52
 
-#define MCP23017_XSHUT_ADDR 7
-#define MCP23017_GPIO_ADDR 1
+#define MCP23017_XSHUT_ADDR 0
+#define MCP23017_GPIO_ADDR 0
 
 
 float   coef = 255.0 / (MAX_DIST / 2);
@@ -34,6 +34,7 @@ void setup() {
   Wire.begin();
 
   // Init mcp23017 xshut
+  Serial.println("Init MCP");
   mcp_xshut.begin(MCP23017_XSHUT_ADDR);
 
   // Set every pin to output
@@ -81,9 +82,9 @@ void loop() {
     if (dist > MAX_DIST)
       leds[i] = CRGB::Black;
     else {
-      int r = 256 - dist * coef;
-      int g = 256 - abs(MAX_DIST / 2 - dist) * coef;
-      int b = 256 - (MAX_DIST - dist) * coef;
+      int r = 255 - dist * coef;
+      int g = 255 - abs(MAX_DIST / 2 - dist) * coef;
+      int b = 255 - (MAX_DIST - dist) * coef;
       leds[i].red = r >= 0 ? r : 0;
       leds[i].green = g >= 0 ? g : 0;
       leds[i].blue = b >= 0 ? b : 0;
