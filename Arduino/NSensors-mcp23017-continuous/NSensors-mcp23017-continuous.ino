@@ -15,7 +15,6 @@
 #define MCP23017_XSHUT_ADDR 0
 #define MCP23017_GPIO_ADDR 0
 
-
 float   coef = 255.0 / (MAX_DIST / 2);
 CRGB    leds[NB_SENSORS];
 VL53L0X sensors[NB_SENSORS];
@@ -61,6 +60,7 @@ void init_sensor(int i) {
   sensors[i].setSignalRateLimit(0.1);
   sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
   sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
+  sensors[i].startContinuous();
 }
 
 void loop() {
@@ -73,7 +73,7 @@ void loop() {
     Serial.print(i + 1);
     Serial.print(" dist :");
 
-    int dist = sensors[i].readRangeSingleMillimeters();
+    int dist = sensors[i].readRangeContinuousMillimeters();
 
     Serial.print(dist);
 
