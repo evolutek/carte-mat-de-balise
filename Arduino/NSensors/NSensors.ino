@@ -4,10 +4,10 @@
 
 #define BRIGHTNESS      128
 #define COLOR_ORDER     RGB
-#define LED_PIN         2
+#define LED_PIN         36
 #define LED_TYPE        WS2812
 #define MAX_DIST        2000
-#define NB_SENSORS      6
+#define NB_SENSORS      2
 #define REFRESH         100
 #define SENSOR_ADDR     0x52
 
@@ -28,13 +28,13 @@ void setup() {
 
   // Init xshut pins
   for (int i = 0; i < NB_SENSORS; i++) {
-    pinMode(i + 3, OUTPUT);
-    digitalWrite(i + 3, LOW);
+    pinMode(i, OUTPUT);
+    digitalWrite(i, LOW);
   }
 
   // Init sensors
   for (int i = NB_SENSORS -1; i >= 0; i--) {
-    digitalWrite(i + 3, HIGH);
+    digitalWrite(i, HIGH);
     init_sensor(i);
   }
 
@@ -42,7 +42,7 @@ void setup() {
 
 void init_sensor(int i) {
   Serial.print("Init sensor nb: ");
-  Serial.println(i + 1);
+  Serial.println(i);
   sensors[i].init();
   sensors[i].setTimeout(500);
   sensors[i].setAddress(SENSOR_ADDR + i);

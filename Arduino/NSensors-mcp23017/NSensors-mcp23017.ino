@@ -5,15 +5,15 @@
 
 #define BRIGHTNESS      128
 #define COLOR_ORDER     RGB
-#define LED_PIN         2
+#define LED_PIN         36
 #define LED_TYPE        WS2812
 #define MAX_DIST        1000
 #define NB_SENSORS      16
 #define REFRESH         0
-#define SENSOR_ADDR     0x52
+#define SENSOR_ADDR     0x29
 
 #define MCP23017_XSHUT_ADDR 0
-#define MCP23017_GPIO_ADDR 0
+#define MCP23017_GPIO_ADDR 7
 
 
 float   coef = 255.0 / (MAX_DIST / 2);
@@ -35,7 +35,7 @@ void setup() {
 
   // Init mcp23017 xshut
   Serial.println("Init MCP");
-  mcp_xshut.begin(MCP23017_XSHUT_ADDR);
+  mcp_xshut.begin();
 
   // Set every pin to output
   for (int i = 0; i < 15; ++i)
