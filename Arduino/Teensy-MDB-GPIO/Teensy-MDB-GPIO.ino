@@ -13,6 +13,7 @@
 #define TIMEOUT_SENSOR    500
 #define XSHUT_START_GPIO  0
 #define LONG_RANGE
+#define SENSORS_I2C Wire
 
 VL53L0X sensors[NB_SENSORS];
 int     scan[NB_SENSORS];
@@ -26,6 +27,10 @@ int* samples[NB_SAMPLES];
 int currentSample = 0;
 bool enableSensors = true;
 
+#define FRONT_PIN 32
+#define BACK_PIN 31
+#define IS_ROBOT_PIN 30
+
 // Led strips
 #define BRIGHTNESS        4
 #define COLOR_ORDER       GRB
@@ -34,30 +39,29 @@ bool enableSensors = true;
 #define LED_LOADING_U     5
 #define LED_LOADING_DELAY 100
 
-CRGB led_loading_color = 
-  //CRGB::Orange;
-  CRGB::Blue;
+CRGB led_loading_color = CRGB::Orange; //CRGB::Blue;
 unsigned int led_loading_next = 0;
 int led_loading_current = 0;
 
-enum debug_modes {
+enum leds_modes {
   DIST,
   ZONES,
   LOADING
 };
 
-enum debug_modes debug_mode = LOADING;
+enum leds_modes leds_mode = LOADING;
 float   coef = 255.0 / (ROBOT_RANGE / 2);
 CRGB    leds[NB_SENSORS];
 
-// Communication
-#define FRONT_GPIO        32
-#define BACK_GPIO         31
-#define ROBOT_GPIO        30
 #define DEBUG_SERIAL
 
 // Remove
 Adafruit_MCP23017 mcp_xshut;
+
+// RaspberryPi communication
+#define RASPI_I2C Wire1
+#define SLAVE_ADDRESS 0x42
+int data_type = 0;
 
 void init_sensor(int i) {
   #ifdef DEBUG_SERIAL
@@ -82,20 +86,19 @@ void init_sensor(int i) {
 
 
 void setup() {
+  
   // Init communication
-  Wire.setClock(I2C_SENSOR_SPEED);
-  Wire.begin();
+  SENSORS_I2C.setClock(I2C_SENSOR_SPEED);
+  SENSORS_I2C.begin();
+
+  // RaspberryPi communication
+  RASPI_I2C.begin(SLAVE_ADDRESS);
+  RASPI_I2C.onRequest(handleRequest);
+  RASPI_I2C.onReceive(handleReceive); 
 
   #ifdef DEBUG_SERIAL
     Serial.begin(115200);
   #endif
-
-  pinMode(FRONT_GPIO, OUTPUT);
-  digitalWrite(FRONT_GPIO, LOW);
-  pinMode(BACK_GPIO, OUTPUT);
-  digitalWrite(BACK_GPIO, LOW);
-  pinMode(ROBOT_GPIO, OUTPUT);
-  digitalWrite(ROBOT_GPIO, LOW);
 
   // Init Led strip
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NB_SENSORS);
@@ -105,6 +108,13 @@ void setup() {
   #ifdef DEBUG_SERIAL
     Serial.println("Init XSHUTs");
   #endif
+
+  pinMode(FRONT_PIN, OUTPUT);
+  pinMode(BACK_PIN, OUTPUT);
+  pinMode(IS_ROBOT_PIN, OUTPUT);
+  digitalWrite(FRONT_PIN, LOW);
+  digitalWrite(BACK_PIN, LOW);
+  digitalWrite(IS_ROBOT_PIN, LOW);
 
   // Remove
   mcp_xshut.begin();
@@ -136,13 +146,77 @@ void setup() {
     doSampleScan();  
   }
 
-  if(debug_mode == LOADING)
+  if(leds_mode == LOADING)
     enableSensors = false;
+}
+
+void handleRequest() {
+
+  #ifdef DEBUG_SERIAL
+    Serial.println("Received data request from RaspberryPi");
+    Serial.print("Current data_type: "); Serial.println(data_type);
+  #endif
+
+  // Scan request
+  if(data_type == 0) {
+    for(int i = 0; i < NB_SENSORS; i++) {
+      int ret = scan[i];
+      if(ret >= 0 && ret <= 8191) RASPI_I2C.write(ret/32);
+      else RASPI_I2C.write(255);
+    }
+  }
+
+  // Zones request
+  if(data_type == 1) {
+    RASPI_I2C.write(is_front ? 1 : 0);
+    RASPI_I2C.write(is_back  ? 1 : 0);
+    RASPI_I2C.write(is_robot ? 1 : 0);
+  }
+}
+
+void handleReceive(int nBytes) {
+
+  #ifdef DEBUG_SERIAL
+    Serial.println("Received data from Raspberrypi");
+  #endif
+
+  if(nBytes < 1) {
+    #ifdef DEBUG_SERIAL
+      Serial.println("ERROR Received receive event with no data");
+    #endif
+    return;
+  }
+  char type = RASPI_I2C.read();
+
+  #ifdef DEBUG_SERIAL
+    Serial.print("Type: ");
+    Serial.println(type);
+  #endif
+
+  // Enable/Disable sensors
+  if(type == 'e')
+    enableSensors = RASPI_I2C.read() != 0;
+  
+  // LEDs mode
+  if(type == 'l') {
+    byte mode = RASPI_I2C.read();
+    if(mode == 0) leds_mode = DIST;
+    if(mode == 1) leds_mode = ZONES;
+    if(mode == 2) leds_mode = LOADING;
+  }
+
+  // Data type (for the next request)
+  if(type == 't')
+    data_type = RASPI_I2C.read();
+
+  // Loading leds color
+  if(type == 'c')
+    led_loading_color = RASPI_I2C.read() == 0 ? CRGB::Orange : CRGB::Blue;
 }
 
 void manage_leds() {
   
-  switch(debug_mode) {
+  switch(leds_mode) {
     case DIST:
       for (int i = 0; i < NB_SENSORS; i++) {
         if (scan[i] > ROBOT_RANGE)
@@ -273,16 +347,16 @@ void loop() {
   bool _is_robot = false;
 
   updateFlags(front_zone, sizeof(front_zone)/sizeof(int), &_is_front, &_is_robot);
-  updateFlags(back_zone, sizeof(front_zone)/sizeof(int), &_is_back, &_is_robot);
+  updateFlags(back_zone, sizeof(back_zone)/sizeof(int), &_is_back, &_is_robot);
   updateFlags(no_zone, sizeof(no_zone)/sizeof(int), NULL, &_is_robot);
 
   is_front = _is_front;
   is_back  = _is_back;
   is_robot = _is_robot;
 
-  digitalWrite(FRONT_GPIO, is_front);
-  digitalWrite(BACK_GPIO,  is_back);
-  digitalWrite(ROBOT_GPIO, is_robot);
+  digitalWrite(FRONT_PIN, is_front);
+  digitalWrite(BACK_PIN, is_back);
+  digitalWrite(IS_ROBOT_PIN, is_robot);
 
   manage_leds();
 }
