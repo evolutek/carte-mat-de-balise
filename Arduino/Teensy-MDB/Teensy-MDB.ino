@@ -22,9 +22,10 @@ int     no_zone[]     = {4, 5, 6, 12, 13, 14};
 bool    is_front    = false;
 bool    is_back     = false;
 bool    is_robot    = false;
-int* samples[NB_SAMPLES];
-int currentSample = 0;
-bool enableSensors = true;
+int*    samples[NB_SAMPLES];
+int     currentSample = 0;
+bool    enableSensors = true;
+bool    failedSensors[NB_SENSORS];
 
 #define FRONT_PIN 32
 #define BACK_PIN 31
@@ -62,32 +63,34 @@ CRGB leds[NB_SENSORS];
 #define SLAVE_ADDRESS 0x42
 int data_type = 0;
 
-void init_sensor(int i) {
+bool init_sensor(int i) {
+    
   #ifdef DEBUG_SERIAL
     Serial.print("Init sensor nb: ");
     Serial.println(i + 1);
   #endif
 
-  if( ! sensors[i].init()) errorOnSensor(1, i);
+  if( ! sensors[i].init()) return false;
   sensors[i].setTimeout(TIMEOUT_SENSOR);
   sensors[i].setAddress(SENSOR_ADDR + i);
 
   // Enable Long Range mode
   #ifdef LONG_RANGE
-    if( ! sensors[i].setSignalRateLimit(0.1)) errorOnSensor(2, i);
-    if( ! sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18)) errorOnSensor(3, i);
-    if( ! sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14)) errorOnSensor(4, i);
+    if( ! sensors[i].setSignalRateLimit(0.1)) return false;
+    if( ! sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18)) return false;
+    if( ! sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14)) return false;
   #endif
 
   // Start continous mode
   sensors[i].startContinuous();
-}
 
+  return true;
+}
 
 void setup() {
 
   #ifdef DEBUG_SERIAL
-    Serial.begin(115200);
+    Serial.begin(9600);
     Serial.println("Started");
   #endif
   
@@ -112,16 +115,19 @@ void setup() {
   digitalWrite(IS_ROBOT_PIN, LOW);
 
   // Set every pin to output
-  for (int i = 0; i < 15; ++i) {
+  for (int i = NB_SENSORS -1; i >= 0; i--) {
     pinMode(XSHUT_START_GPIO + i, OUTPUT);
     digitalWrite(XSHUT_START_GPIO + i, LOW);
   }
 
   // Init sensors
+  bool failed = false;
   for (int i = NB_SENSORS -1; i >= 0; i--) {
     digitalWrite(XSHUT_START_GPIO + i, HIGH);
-    init_sensor(i);
+    failedSensors[i] = !init_sensor(i);
+    if(failedSensors[i]) failed = true;
   }
+  if(failed) errorMode(true);
 
   for(int i = 0; i < NB_SAMPLES; i++) {
     samples[i] = (int*) malloc(sizeof(int)*NB_SENSORS);
@@ -208,7 +214,7 @@ void handleReceive(int nBytes) {
 
   // Set error mode
   if(type == 'r')
-    errorMode(16);
+    errorMode(false);
 }
 
 void manage_leds() {
@@ -370,17 +376,9 @@ void loop() {
 // When the MDB blinks in red it means an error occured
 // The blinking will occur in this order:
 // Full red to show it's an error (500ms)
-// A given amount of red to give the error id (500ms) (search in this code 
-// the calls to errorMode(<numberYouRead> or errorOnSensor(<numberYouRead>
-// If known, the sensor that failed in yellow (500ms)
-// WARNING: The shown sensor is the first one that failed, and the init sequence
-// starts from the end!
+// If known, the sensors that failed in yellow (500ms)
 
-void errorMode(unsigned int errorId) {
-    errorOnSensor(errorId, -1);
-}
-
-void errorOnSensor(unsigned int errorId, unsigned int sensorId) {
+void errorMode(bool specificSensors) {
   while(1) {
 
     // First blink
@@ -393,21 +391,10 @@ void errorOnSensor(unsigned int errorId, unsigned int sensorId) {
     FastLED.show();
     delay(500);
 
-    // Error id
-    for(unsigned int i = 0; i < errorId; i++)
-      leds[i] = CRGB::Red;
-    FastLED.show();
-    delay(500);
-    for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
-      leds[i] = CRGB::Black;
-    FastLED.show();
-    delay(500);
-
     // Sensor id
-    if(sensorId != 1) {
+    if(specificSensors) {
       for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
-        leds[i] = CRGB::Black;
-      leds[sensorId] = CRGB::Yellow;
+        leds[i] = failedSensors[i] ? CRGB::Yellow : CRGB::Black;
       FastLED.show();
       delay(500);
       for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
