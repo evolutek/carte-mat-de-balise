@@ -1,7 +1,6 @@
 #include <Wire.h>
 #include <VL53L0X.h>
 #include <FastLED.h>
-#include <Adafruit_MCP23017.h>
 
 // Sensors
 #define AVOID_RANGE       500
@@ -13,6 +12,7 @@
 #define TIMEOUT_SENSOR    500
 #define XSHUT_START_GPIO  0
 #define LONG_RANGE
+#define SENSORS_I2C Wire
 
 VL53L0X sensors[NB_SENSORS];
 int     scan[NB_SENSORS];
@@ -26,38 +26,41 @@ int* samples[NB_SAMPLES];
 int currentSample = 0;
 bool enableSensors = true;
 
+#define FRONT_PIN 32
+#define BACK_PIN 31
+#define IS_ROBOT_PIN 30
+
 // Led strips
-#define BRIGHTNESS        4
-#define COLOR_ORDER       GRB
-#define LED_PIN           29
-#define LED_TYPE          WS2812
-#define LED_LOADING_U     5
-#define LED_LOADING_DELAY 100
+#define DEFAULT_BRIGHTNESS 8
+#define COLOR_ORDER        GRB
+#define LED_PIN            29
+#define LED_TYPE           WS2812
+#define LED_LOADING_U      5
+#define LED_LOADING_DELAY  100
+#define LED_DISABLED_DELAY 400
+#define LED_ORANGE CRGB(255, 35, 0)
 
-CRGB led_loading_color = 
-  //CRGB::Orange;
-  CRGB::Blue;
-unsigned int led_loading_next = 0;
-int led_loading_current = 0;
-
-enum debug_modes {
+enum leds_modes {
   DIST,
   ZONES,
-  LOADING
+  LOADING,
+  DISABLED
 };
 
-enum debug_modes debug_mode = LOADING;
-float   coef = 255.0 / (ROBOT_RANGE / 2);
-CRGB    leds[NB_SENSORS];
+enum leds_modes leds_mode = LOADING;
+float coef = 255.0 / (ROBOT_RANGE / 2);
+CRGB led_loading_color = CRGB::Orange; //CRGB::Blue;
+unsigned int led_timer = 0;
+int led_loading_current = 0;
+bool led_disabled_even = true;
+CRGB leds[NB_SENSORS];
 
-// Communication
-#define FRONT_GPIO        32
-#define BACK_GPIO         31
-#define ROBOT_GPIO        30
 #define DEBUG_SERIAL
 
-// Remove
-Adafruit_MCP23017 mcp_xshut;
+// RaspberryPi communication
+#define RASPI_I2C Wire1
+#define SLAVE_ADDRESS 0x42
+int data_type = 0;
 
 void init_sensor(int i) {
   #ifdef DEBUG_SERIAL
@@ -65,15 +68,15 @@ void init_sensor(int i) {
     Serial.println(i + 1);
   #endif
 
-  sensors[i].init();
+  if( ! sensors[i].init()) errorMode(1);
   sensors[i].setTimeout(TIMEOUT_SENSOR);
   sensors[i].setAddress(SENSOR_ADDR + i);
 
   // Enable Long Range mode
   #ifdef LONG_RANGE
-    sensors[i].setSignalRateLimit(0.1);
-    sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
-    sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
+    if( ! sensors[i].setSignalRateLimit(0.1)) errorMode(2);
+    if( ! sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18)) errorMode(3);
+    if( ! sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14)) errorMode(4);
   #endif
 
   // Start continous mode
@@ -82,52 +85,41 @@ void init_sensor(int i) {
 
 
 void setup() {
-  // Init communication
-  Wire.setClock(I2C_SENSOR_SPEED);
-  Wire.begin();
 
   #ifdef DEBUG_SERIAL
     Serial.begin(115200);
+    Serial.println("Started");
   #endif
+  
+  // Init communication
+  SENSORS_I2C.setClock(I2C_SENSOR_SPEED);
+  SENSORS_I2C.begin();
 
-  pinMode(FRONT_GPIO, OUTPUT);
-  digitalWrite(FRONT_GPIO, LOW);
-  pinMode(BACK_GPIO, OUTPUT);
-  digitalWrite(BACK_GPIO, LOW);
-  pinMode(ROBOT_GPIO, OUTPUT);
-  digitalWrite(ROBOT_GPIO, LOW);
+  // RaspberryPi communication
+  RASPI_I2C.begin(SLAVE_ADDRESS);
+  RASPI_I2C.onRequest(handleRequest);
+  RASPI_I2C.onReceive(handleReceive); 
 
   // Init Led strip
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NB_SENSORS);
-  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.setBrightness(DEFAULT_BRIGHTNESS);
 
-  // Init XSHUTs
-  #ifdef DEBUG_SERIAL
-    Serial.println("Init XSHUTs");
-  #endif
-
-  // Remove
-  mcp_xshut.begin();
+  pinMode(FRONT_PIN, OUTPUT);
+  pinMode(BACK_PIN, OUTPUT);
+  pinMode(IS_ROBOT_PIN, OUTPUT);
+  digitalWrite(FRONT_PIN, LOW);
+  digitalWrite(BACK_PIN, LOW);
+  digitalWrite(IS_ROBOT_PIN, LOW);
 
   // Set every pin to output
-  for (int i = 0; i < 15; ++i)
-  {
-    // Remove
-    mcp_xshut.pinMode(i, OUTPUT);
-    mcp_xshut.digitalWrite(i, LOW);
-
-    //pinMode(XSHUT_START_GPIO + i, OUTPUT);
-    //digitalWrite(XSHUT_START_GPIO + i, LOW);
-    //
+  for (int i = 0; i < 15; ++i) {
+    pinMode(XSHUT_START_GPIO + i, OUTPUT);
+    digitalWrite(XSHUT_START_GPIO + i, LOW);
   }
 
   // Init sensors
   for (int i = NB_SENSORS -1; i >= 0; i--) {
-
-    // Remove
-    mcp_xshut.digitalWrite(i, HIGH);
-
-    //digitalWrite(XSHUT_START_GPIO + i, HIGH);
+    digitalWrite(XSHUT_START_GPIO + i, HIGH);
     init_sensor(i);
   }
 
@@ -136,13 +128,86 @@ void setup() {
     doSampleScan();  
   }
 
-  if(debug_mode == LOADING)
+  if(leds_mode == LOADING)
     enableSensors = false;
+}
+
+void handleRequest() {
+
+  #ifdef DEBUG_SERIAL
+    Serial.println("Received data request from RaspberryPi");
+    Serial.print("Current data_type: "); Serial.println(data_type);
+  #endif
+
+  // Scan request
+  if(data_type == 0) {
+    for(int i = 0; i < NB_SENSORS; i++) {
+      int ret = scan[i];
+      if(ret >= 0 && ret <= 8191) RASPI_I2C.write(ret/32);
+      else RASPI_I2C.write(255);
+    }
+  }
+
+  // Zones request
+  if(data_type == 1) {
+    RASPI_I2C.write(is_front ? 1 : 0);
+    RASPI_I2C.write(is_back  ? 1 : 0);
+    RASPI_I2C.write(is_robot ? 1 : 0);
+  }
+}
+
+void handleReceive(int nBytes) {
+
+  #ifdef DEBUG_SERIAL
+    Serial.println("Received data from Raspberrypi");
+  #endif
+
+  if(nBytes < 1) {
+    #ifdef DEBUG_SERIAL
+      Serial.println("ERROR Received receive event with no data");
+    #endif
+    return;
+  }
+  char type = RASPI_I2C.read();
+
+  #ifdef DEBUG_SERIAL
+    Serial.print("Type: ");
+    Serial.println(type);
+  #endif
+
+  // Enable/Disable sensors
+  if(type == 'e')
+    enableSensors = RASPI_I2C.read() != 0;
+  
+  // LEDs mode
+  if(type == 'l') {
+    byte mode = RASPI_I2C.read();
+    if(mode == 0) leds_mode = DIST;
+    if(mode == 1) leds_mode = ZONES;
+    if(mode == 2) leds_mode = LOADING;
+    if(mode == 3) leds_mode = DISABLED;
+  }
+
+  // Data type (for the next request)
+  if(type == 't')
+    data_type = RASPI_I2C.read();
+
+  // Loading leds color
+  if(type == 'c')
+    led_loading_color = RASPI_I2C.read() == 0 ? CRGB::Orange : CRGB::Blue;
+
+  // Change brightness
+  if(type == 'b')
+    FastLED.setBrightness(RASPI_I2C.read());
+
+  // Set error mode
+  if(type == 'r')
+    errorMode(16);
 }
 
 void manage_leds() {
   
-  switch(debug_mode) {
+  switch(leds_mode) {
     case DIST:
       for (int i = 0; i < NB_SENSORS; i++) {
         if (scan[i] > ROBOT_RANGE)
@@ -160,10 +225,10 @@ void manage_leds() {
 
     case ZONES: 
       if(is_robot) {
-        for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
+        for(unsigned int i = 0; i < NB_SENSORS; i++)
           leds[i] = CRGB::Orange;
       } else {
-        for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
+        for(unsigned int i = 0; i < NB_SENSORS; i++)
           leds[i] = CRGB::Green;
       }   
       if(is_front) {
@@ -177,13 +242,21 @@ void manage_leds() {
       break;
 
     case LOADING:
-      if(millis() > led_loading_next) {
+      if(millis() > led_timer) {
         leds[led_loading_current] = CRGB::Black;
         leds[(led_loading_current + LED_LOADING_U) % NB_SENSORS] = led_loading_color;
         led_loading_current = (led_loading_current + 1) % NB_SENSORS;
-        led_loading_next = millis() + LED_LOADING_DELAY;
+        led_timer = millis() + LED_LOADING_DELAY;
       }
       break;
+
+    case DISABLED:
+      if(millis() > led_timer) {
+        led_timer = millis() + LED_DISABLED_DELAY;
+        led_disabled_even = !led_disabled_even;
+        for(int i = 0; i < NB_SENSORS; i++)
+          leds[i] = (i%2 == 0) == led_disabled_even ? CRGB::Black : LED_ORANGE;
+      }
 
     default:
       break;
@@ -273,16 +346,37 @@ void loop() {
   bool _is_robot = false;
 
   updateFlags(front_zone, sizeof(front_zone)/sizeof(int), &_is_front, &_is_robot);
-  updateFlags(back_zone, sizeof(front_zone)/sizeof(int), &_is_back, &_is_robot);
+  updateFlags(back_zone, sizeof(back_zone)/sizeof(int), &_is_back, &_is_robot);
   updateFlags(no_zone, sizeof(no_zone)/sizeof(int), NULL, &_is_robot);
 
   is_front = _is_front;
   is_back  = _is_back;
   is_robot = _is_robot;
 
-  digitalWrite(FRONT_GPIO, is_front);
-  digitalWrite(BACK_GPIO,  is_back);
-  digitalWrite(ROBOT_GPIO, is_robot);
+  digitalWrite(FRONT_PIN, is_front);
+  digitalWrite(BACK_PIN, is_back);
+  digitalWrite(IS_ROBOT_PIN, is_robot);
 
   manage_leds();
+}
+
+void errorMode(unsigned int id) {
+  while(1) {
+    for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
+      leds[i] = CRGB::Red;
+    FastLED.show();
+    delay(500);
+    for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
+      leds[i] = CRGB::Black;
+    FastLED.show();
+    delay(500);
+    for(unsigned int i = 0; i < id; i++)
+      leds[i] = CRGB::Red;
+    FastLED.show();
+    delay(500);
+    for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
+      leds[i] = CRGB::Black;
+    FastLED.show();
+    delay(500);
+  }
 }
