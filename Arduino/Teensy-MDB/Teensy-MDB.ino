@@ -31,7 +31,7 @@ bool enableSensors = true;
 #define IS_ROBOT_PIN 30
 
 // Led strips
-#define DEFAULT_BRIGHTNESS 8
+#define DEFAULT_BRIGHTNESS 1
 #define COLOR_ORDER        GRB
 #define LED_PIN            29
 #define LED_TYPE           WS2812
@@ -68,15 +68,15 @@ void init_sensor(int i) {
     Serial.println(i + 1);
   #endif
 
-  if( ! sensors[i].init()) errorMode(1);
+  if( ! sensors[i].init()) errorOnSensor(1, i);
   sensors[i].setTimeout(TIMEOUT_SENSOR);
   sensors[i].setAddress(SENSOR_ADDR + i);
 
   // Enable Long Range mode
   #ifdef LONG_RANGE
-    if( ! sensors[i].setSignalRateLimit(0.1)) errorMode(2);
-    if( ! sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18)) errorMode(3);
-    if( ! sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14)) errorMode(4);
+    if( ! sensors[i].setSignalRateLimit(0.1)) errorOnSensor(2, i);
+    if( ! sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18)) errorOnSensor(3, i);
+    if( ! sensors[i].setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14)) errorOnSensor(4, i);
   #endif
 
   // Start continous mode
@@ -143,8 +143,14 @@ void handleRequest() {
   if(data_type == 0) {
     for(int i = 0; i < NB_SENSORS; i++) {
       int ret = scan[i];
-      if(ret >= 0 && ret <= 8191) RASPI_I2C.write(ret/32);
-      else RASPI_I2C.write(255);
+      if(ret >= 0 && ret <= 8191) {
+        RASPI_I2C.write(ret/256);
+        RASPI_I2C.write(ret%256);
+      }
+      else {
+        RASPI_I2C.write(255);
+        RASPI_I2C.write(255);
+      }
     }
   }
 
@@ -360,8 +366,24 @@ void loop() {
   manage_leds();
 }
 
-void errorMode(unsigned int id) {
+// Error mode
+// When the MDB blinks in red it means an error occured
+// The blinking will occur in this order:
+// Full red to show it's an error (500ms)
+// A given amount of red to give the error id (500ms) (search in this code 
+// the calls to errorMode(<numberYouRead> or errorOnSensor(<numberYouRead>
+// If known, the sensor that failed in yellow (500ms)
+// WARNING: The shown sensor is the first one that failed, and the init sequence
+// starts from the end!
+
+void errorMode(unsigned int errorId) {
+    errorOnSensor(errorId, -1);
+}
+
+void errorOnSensor(unsigned int errorId, unsigned int sensorId) {
   while(1) {
+
+    // First blink
     for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
       leds[i] = CRGB::Red;
     FastLED.show();
@@ -370,7 +392,9 @@ void errorMode(unsigned int id) {
       leds[i] = CRGB::Black;
     FastLED.show();
     delay(500);
-    for(unsigned int i = 0; i < id; i++)
+
+    // Error id
+    for(unsigned int i = 0; i < errorId; i++)
       leds[i] = CRGB::Red;
     FastLED.show();
     delay(500);
@@ -378,5 +402,18 @@ void errorMode(unsigned int id) {
       leds[i] = CRGB::Black;
     FastLED.show();
     delay(500);
+
+    // Sensor id
+    if(sensorId != 1) {
+      for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
+        leds[i] = CRGB::Black;
+      leds[sensorId] = CRGB::Yellow;
+      FastLED.show();
+      delay(500);
+      for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
+        leds[i] = CRGB::Black;
+      FastLED.show();
+      delay(500);
+    }
   }
 }
