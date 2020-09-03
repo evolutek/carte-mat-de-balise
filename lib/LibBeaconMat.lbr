@@ -311,7 +311,7 @@ reflow soldering</description>
 <packageinstance name="DIP787W45P254L3556H508Q28"/>
 </packageinstances>
 </package3d>
-<package3d name="B04B-PASK" urn="urn:adsk.eagle:package:11903789/3" type="box">
+<package3d name="B04B-PASK" urn="urn:adsk.eagle:package:11903789/4" type="model">
 <packageinstances>
 <packageinstance name="B04B-PASK"/>
 </packageinstances>
@@ -641,7 +641,7 @@ reflow soldering</description>
 </device>
 </devices>
 </deviceset>
-<deviceset name="JST4" urn="urn:adsk.eagle:component:11903794/3" prefix="J">
+<deviceset name="JST4" urn="urn:adsk.eagle:component:11903794/3" locally_modified="yes" prefix="J">
 <gates>
 <gate name="G$1" symbol="JST4" x="0" y="0"/>
 </gates>
@@ -654,7 +654,7 @@ reflow soldering</description>
 <connect gate="G$1" pin="4" pad="P$4"/>
 </connects>
 <package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:11903789/3"/>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:11903789/4"/>
 </package3dinstances>
 <technologies>
 <technology name=""/>
