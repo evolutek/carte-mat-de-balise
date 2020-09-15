@@ -1,6 +1,6 @@
 #include <Wire.h>
-#include <VL53L0X.h>
-#include <FastLED.h>
+#include <VL53L0X.h> // By Pololu v1.2.0
+#include <FastLED.h> // By Daniel Garcia v3.3.3
 
 // Sensors
 #define AVOID_RANGE       500
@@ -57,6 +57,10 @@ bool led_disabled_even = true;
 CRGB leds[NB_SENSORS];
 
 #define DEBUG_SERIAL
+
+// In error mode by default. The RaspberryPI disables
+// it with I2C on startup (if the I2C bus works)
+bool enableErrorMode = true;
 
 // RaspberryPi communication
 #define RASPI_I2C Wire1
@@ -212,9 +216,9 @@ void handleReceive(int nBytes) {
   if(type == 'b')
     FastLED.setBrightness(RASPI_I2C.read());
 
-  // Set error mode
+  // Enable/Disable error mode
   if(type == 'r')
-    errorMode(false);
+    enableErrorMode = RASPI_I2C.read() != 0;
 }
 
 void manage_leds() {
@@ -313,6 +317,9 @@ void doSampleScan() {
 
 void loop() {
 
+  if(enableErrorMode)
+    errorMode(false);
+
   if(!enableSensors) {
     manage_leds();
     return;
@@ -378,8 +385,10 @@ void loop() {
 // Full red to show it's an error (500ms)
 // If known, the sensors that failed in yellow (500ms)
 
+// This function stays in error mode forever if the specificSensors parameter is ON (one or more 
+// sensors couldn't be initialised). Or until the raspberrypi disables it by I2C (unknown error)
 void errorMode(bool specificSensors) {
-  while(1) {
+  while(!specificSensors && enableErrorMode) {
 
     // First blink
     for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
