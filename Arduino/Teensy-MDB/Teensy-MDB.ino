@@ -22,7 +22,7 @@ int     no_zone[]     = {4, 5, 6, 12, 13, 14};
 bool    is_front    = false;
 bool    is_back     = false;
 bool    is_robot    = false;
-int*    samples[NB_SAMPLES];
+int     samples[NB_SAMPLES * NB_SENSORS];
 int     currentSample = 0;
 bool    enableSensors = true;
 bool    failedSensors[NB_SENSORS];
@@ -68,7 +68,7 @@ bool enableErrorMode = true;
 int data_type = 0;
 
 bool init_sensor(int i) {
-    
+
   #ifdef DEBUG_SERIAL
     Serial.print("Init sensor nb: ");
     Serial.println(i + 1);
@@ -93,6 +93,8 @@ bool init_sensor(int i) {
 
 void setup() {
 
+  delay(1000); // Without this, the first serial messages are not received
+  
   #ifdef DEBUG_SERIAL
     Serial.begin(9600);
     Serial.println("Started");
@@ -119,24 +121,36 @@ void setup() {
   digitalWrite(IS_ROBOT_PIN, LOW);
 
   // Set every pin to output
-  for (int i = NB_SENSORS -1; i >= 0; i--) {
+  for (int i = 0; i < NB_SENSORS; i++) {
     pinMode(XSHUT_START_GPIO + i, OUTPUT);
     digitalWrite(XSHUT_START_GPIO + i, LOW);
   }
 
-  // Init sensors
+  // First initialisation loop to detect unusable sensors
+  // When the GPIO goes high, it enables the sensor to respond to I2C messages,
+  // but it will also respond to messages that were not meant for it. So we
+  // have to set the sensors low when it's not their turn to respond, but that
+  // resets the initialisation parameters so we added a second init loop after this one
   bool failed = false;
-  for (int i = NB_SENSORS -1; i >= 0; i--) {
+  for (int i = 0; i < NB_SENSORS; i++) {
     digitalWrite(XSHUT_START_GPIO + i, HIGH);
     failedSensors[i] = !init_sensor(i);
-    if(failedSensors[i]) failed = true;
+    if(failedSensors[i]) {
+      Serial.println("Failed");
+      failed = true;
+    }
+    digitalWrite(XSHUT_START_GPIO + i, LOW);
   }
   if(failed) errorMode(true);
 
-  for(int i = 0; i < NB_SAMPLES; i++) {
-    samples[i] = (int*) malloc(sizeof(int)*NB_SENSORS);
-    doSampleScan();  
+  // Second init loop to init the sensors
+  for (int i = NB_SENSORS -1; i >= 0; i--) {
+    digitalWrite(XSHUT_START_GPIO + i, HIGH);
+    init_sensor(i);  
   }
+
+  for(int i = 0; i < NB_SAMPLES; i++)
+    doSampleScan();
 
   if(leds_mode == LOADING)
     enableSensors = false;
@@ -301,11 +315,11 @@ void doSampleScan() {
       Serial.print(" dist :");
     #endif
 
-    samples[currentSample][sensorIndex] = 
+    samples[currentSample * NB_SENSORS + sensorIndex] = 
       sensors[sensorIndex].readRangeContinuousMillimeters();
 
     #ifdef DEBUG_SERIAL
-      Serial.print(samples[currentSample][sensorIndex]);
+      Serial.print(samples[currentSample * NB_SENSORS + sensorIndex]);
       if (sensors[sensorIndex].timeoutOccurred())
         Serial.print(" TIMEOUT");
       Serial.println();
@@ -338,24 +352,24 @@ void loop() {
     Serial.println(millis() - start);
   #endif
 
-  for(int i = 0; i < NB_SENSORS; i++) {
-    scan[i] = 0;
+  for(int sensorid = 0; sensorid < NB_SENSORS; sensorid++) {
+    scan[sensorid] = 0;
     #ifdef DEBUG_SERIAL
       Serial.print("Sensor id: ");
-      Serial.print(i);
+      Serial.print(sensorid);
       Serial.print("; values:");
     #endif
-    for(int j = 0; j < NB_SAMPLES; j++) {
-      scan[i] += samples[j][i];
+    for(int sampleid = 0; sampleid < NB_SAMPLES; sampleid++) {
+      scan[sensorid] += samples[sampleid * NB_SENSORS + sensorid];
       #ifdef DEBUG_SERIAL
         Serial.print(" ");
-        Serial.print(samples[j][i]);
+        Serial.print(samples[sampleid * NB_SENSORS + sensorid]);
       #endif
     }
-    scan[i] /= NB_SAMPLES;
+    scan[sensorid] /= NB_SAMPLES;
     #ifdef DEBUG_SERIAL
       Serial.print("; Average: ");
-      Serial.print(scan[i]);
+      Serial.print(scan[sensorid]);
       Serial.println();
     #endif
   }
@@ -388,7 +402,7 @@ void loop() {
 // This function stays in error mode forever if the specificSensors parameter is ON (one or more 
 // sensors couldn't be initialised). Or until the raspberrypi disables it by I2C (unknown error)
 void errorMode(bool specificSensors) {
-  while(!specificSensors && enableErrorMode) {
+  while(specificSensors || enableErrorMode) {
 
     // First blink
     for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
