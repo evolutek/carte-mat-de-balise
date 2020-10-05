@@ -8,7 +8,7 @@
 #define NB_SENSORS        16
 #define NB_SAMPLES        5
 #define ROBOT_RANGE       1000
-#define SENSOR_ADDR       0x29
+#define SENSOR_ADDR       0x30
 #define TIMEOUT_SENSOR    500
 #define XSHUT_START_GPIO  0
 #define LONG_RANGE
@@ -22,7 +22,7 @@ int     no_zone[]     = {4, 5, 6, 12, 13, 14};
 bool    is_front    = false;
 bool    is_back     = false;
 bool    is_robot    = false;
-int     samples[NB_SAMPLES * NB_SENSORS];
+int*    samples[NB_SAMPLES];
 int     currentSample = 0;
 bool    enableSensors = true;
 bool    failedSensors[NB_SENSORS];
@@ -58,9 +58,11 @@ CRGB leds[NB_SENSORS];
 
 #define DEBUG_SERIAL
 
-// In error mode by default. The RaspberryPI disables
+bool enableErrorMode = false;
+
+// In waiting mode by default. The RaspberryPI disables
 // it with I2C on startup (if the I2C bus works)
-bool enableErrorMode = true;
+bool enableWaitingMode = true;
 
 // RaspberryPi communication
 #define RASPI_I2C Wire1
@@ -68,12 +70,16 @@ bool enableErrorMode = true;
 int data_type = 0;
 
 bool init_sensor(int i) {
-
+    
   #ifdef DEBUG_SERIAL
     Serial.print("Init sensor nb: ");
     Serial.println(i + 1);
   #endif
 
+  delay(100);
+
+  sensors[i].setTimeout(TIMEOUT_SENSOR);
+  sensors[i].setAddress(SENSOR_ADDR + i);
   if( ! sensors[i].init()) return false;
   sensors[i].setTimeout(TIMEOUT_SENSOR);
   sensors[i].setAddress(SENSOR_ADDR + i);
@@ -93,10 +99,9 @@ bool init_sensor(int i) {
 
 void setup() {
 
-  delay(1000); // Without this, the first serial messages are not received
-  
   #ifdef DEBUG_SERIAL
     Serial.begin(9600);
+    delay(1000);
     Serial.println("Started");
   #endif
   
@@ -121,37 +126,30 @@ void setup() {
   digitalWrite(IS_ROBOT_PIN, LOW);
 
   // Set every pin to output
-  for (int i = 0; i < NB_SENSORS; i++) {
+  for (int i = NB_SENSORS -1; i >= 0; i--) {
     pinMode(XSHUT_START_GPIO + i, OUTPUT);
     digitalWrite(XSHUT_START_GPIO + i, LOW);
   }
 
-  // First initialisation loop to detect unusable sensors
-  // When the GPIO goes high, it enables the sensor to respond to I2C messages,
-  // but it will also respond to messages that were not meant for it. So we
-  // have to set the sensors low when it's not their turn to respond, but that
-  // resets the initialisation parameters so we added a second init loop after this one
+  // Init sensors
   bool failed = false;
-  for (int i = 0; i < NB_SENSORS; i++) {
+  for (int i = NB_SENSORS -1; i >= 0; i--) {
     digitalWrite(XSHUT_START_GPIO + i, HIGH);
     failedSensors[i] = !init_sensor(i);
     if(failedSensors[i]) {
-      Serial.println("Failed");
+      #ifdef DEBUG_SERIAL
+        Serial.println("FAILED");
+      #endif
       failed = true;
     }
-    digitalWrite(XSHUT_START_GPIO + i, LOW);
   }
   if(failed) errorMode(true);
 
-  // Second init loop to init the sensors
-  for (int i = NB_SENSORS -1; i >= 0; i--) {
-    digitalWrite(XSHUT_START_GPIO + i, HIGH);
-    init_sensor(i);  
-  }
-
-  for(int i = 0; i < NB_SAMPLES; i++)
+  for(int i = 0; i < NB_SAMPLES; i++) {
+    samples[i] = (int*) malloc(sizeof(int)*NB_SENSORS); 
     doSampleScan();
-
+  }
+  
   if(leds_mode == LOADING)
     enableSensors = false;
 }
@@ -230,9 +228,13 @@ void handleReceive(int nBytes) {
   if(type == 'b')
     FastLED.setBrightness(RASPI_I2C.read());
 
-  // Enable/Disable error mode
-  if(type == 'r')
-    enableErrorMode = RASPI_I2C.read() != 0;
+  // Enable/Disable error mode (Also disables waiting mode)
+  if(type == 'r') {
+    int enable_ = RASPI_I2C.read() != 0;
+    enableErrorMode = enable_;
+    if(!enable_)
+      enableWaitingMode = false;
+  }
 }
 
 void manage_leds() {
@@ -315,11 +317,11 @@ void doSampleScan() {
       Serial.print(" dist :");
     #endif
 
-    samples[currentSample * NB_SENSORS + sensorIndex] = 
+    samples[currentSample][sensorIndex] = 
       sensors[sensorIndex].readRangeContinuousMillimeters();
 
     #ifdef DEBUG_SERIAL
-      Serial.print(samples[currentSample * NB_SENSORS + sensorIndex]);
+      Serial.print(samples[currentSample][sensorIndex]);
       if (sensors[sensorIndex].timeoutOccurred())
         Serial.print(" TIMEOUT");
       Serial.println();
@@ -333,6 +335,9 @@ void loop() {
 
   if(enableErrorMode)
     errorMode(false);
+
+  if(enableWaitingMode)
+    waitingMode();
 
   if(!enableSensors) {
     manage_leds();
@@ -352,24 +357,24 @@ void loop() {
     Serial.println(millis() - start);
   #endif
 
-  for(int sensorid = 0; sensorid < NB_SENSORS; sensorid++) {
-    scan[sensorid] = 0;
+  for(int i = 0; i < NB_SENSORS; i++) {
+    scan[i] = 0;
     #ifdef DEBUG_SERIAL
       Serial.print("Sensor id: ");
-      Serial.print(sensorid);
+      Serial.print(i);
       Serial.print("; values:");
     #endif
-    for(int sampleid = 0; sampleid < NB_SAMPLES; sampleid++) {
-      scan[sensorid] += samples[sampleid * NB_SENSORS + sensorid];
+    for(int j = 0; j < NB_SAMPLES; j++) {
+      scan[i] += samples[j][i];
       #ifdef DEBUG_SERIAL
         Serial.print(" ");
-        Serial.print(samples[sampleid * NB_SENSORS + sensorid]);
+        Serial.print(samples[j][i]);
       #endif
     }
-    scan[sensorid] /= NB_SAMPLES;
+    scan[i] /= NB_SAMPLES;
     #ifdef DEBUG_SERIAL
       Serial.print("; Average: ");
-      Serial.print(scan[sensorid]);
+      Serial.print(scan[i]);
       Serial.println();
     #endif
   }
@@ -400,13 +405,17 @@ void loop() {
 // If known, the sensors that failed in yellow (500ms)
 
 // This function stays in error mode forever if the specificSensors parameter is ON (one or more 
-// sensors couldn't be initialised). Or until the raspberrypi disables it by I2C (unknown error)
+// sensors couldn't be initialised). Or until the raspberrypi disables it by I2C
 void errorMode(bool specificSensors) {
-  while(specificSensors || enableErrorMode) {
+  while(!specificSensors && enableErrorMode) {
+
+    #ifdef DEBUG_SERIAL
+      Serial.println("ERROR MODE #################");
+    #endif
 
     // First blink
     for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
-      leds[i] = CRGB::Red;
+      leds[i] = CRGB::Yellow;
     FastLED.show();
     delay(500);
     for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
@@ -425,5 +434,25 @@ void errorMode(bool specificSensors) {
       FastLED.show();
       delay(500);
     }
+  }
+}
+
+// This function stays in waiting mode until the raspberrypi disables it by I2C
+void waitingMode() {
+  while(enableWaitingMode) {
+
+    #ifdef DEBUG_SERIAL
+      Serial.println("WAITING MODE #################");
+    #endif
+
+    // First blink
+    for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
+      leds[i] = CRGB::Green;
+    FastLED.show();
+    delay(500);
+    for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
+      leds[i] = CRGB::Black;
+    FastLED.show();
+    delay(500);
   }
 }
