@@ -407,7 +407,7 @@ void loop() {
 // This function stays in error mode forever if the specificSensors parameter is ON (one or more 
 // sensors couldn't be initialised). Or until the raspberrypi disables it by I2C
 void errorMode(bool specificSensors) {
-  while(!specificSensors && enableErrorMode) {
+  while(specificSensors || enableErrorMode) {
 
     #ifdef DEBUG_SERIAL
       Serial.println("ERROR MODE #################");
@@ -428,7 +428,7 @@ void errorMode(bool specificSensors) {
       for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
         leds[i] = failedSensors[i] ? CRGB::Yellow : CRGB::Black;
       FastLED.show();
-      delay(500);
+      delay(1500);
       for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
         leds[i] = CRGB::Black;
       FastLED.show();
