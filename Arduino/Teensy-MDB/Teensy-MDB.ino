@@ -3,11 +3,9 @@
 #include <FastLED.h> // By Daniel Garcia v3.3.3
 
 // Sensors
-#define AVOID_RANGE       500
 #define I2C_SENSOR_SPEED  400000
 #define NB_SENSORS        16
 #define NB_SAMPLES        5
-#define ROBOT_RANGE       1000
 #define SENSOR_ADDR       0x30
 #define TIMEOUT_SENSOR    500
 #define XSHUT_START_GPIO  0
@@ -16,16 +14,18 @@
 
 VL53L0X sensors[NB_SENSORS];
 int     scan[NB_SENSORS];
-int     front_zone[]  = {15, 16, 1, 2, 3};
-int     back_zone[]   = {7, 8, 9, 10, 11};
-int     no_zone[]     = {4, 5, 6, 12, 13, 14};
-bool    is_front    = false;
-bool    is_back     = false;
-bool    is_robot    = false;
+int     front_zone[]      = {15, 16, 1, 2, 3};
+int     back_zone[]       = {7, 8, 9, 10, 11};
+int     no_zone[]         = {4, 5, 6, 12, 13, 14};
+bool    is_front          = false;
+bool    is_back           = false;
+bool    is_robot          = false;
 int*    samples[NB_SAMPLES];
-int     currentSample = 0;
-bool    enableSensors = true;
+int     currentSample     = 0;
+bool    enableSensors     = true;
 bool    failedSensors[NB_SENSORS];
+int     near              = 500;
+int     far               = 1000;
 
 #define FRONT_PIN 32
 #define BACK_PIN 31
@@ -49,7 +49,7 @@ enum leds_modes {
 };
 
 enum leds_modes leds_mode = LOADING;
-float coef = 255.0 / (ROBOT_RANGE / 2);
+float coef = 255.0 / (far / 2);
 CRGB led_loading_color = CRGB::Orange; //CRGB::Blue;
 unsigned int led_timer = 0;
 int led_loading_current = 0;
@@ -228,6 +228,18 @@ void handleReceive(int nBytes) {
   if(type == 'b')
     FastLED.setBrightness(RASPI_I2C.read());
 
+  // Change near distance
+  if(type == 'n') {
+    int highB = RASPI_I2C.read();
+    near = highB*256 + RASPI_I2C.read();
+  } 
+
+  // Change far distance
+  if(type == 'f') {
+    int highB = RASPI_I2C.read();
+    far = highB*256 + RASPI_I2C.read();
+  } 
+
   // Enable/Disable error mode (Also disables waiting mode)
   if(type == 'r') {
     int enable_ = RASPI_I2C.read() != 0;
@@ -242,12 +254,12 @@ void manage_leds() {
   switch(leds_mode) {
     case DIST:
       for (int i = 0; i < NB_SENSORS; i++) {
-        if (scan[i] > ROBOT_RANGE)
+        if (scan[i] > far)
           leds[i] = CRGB::Black;
         else {
           int r = 255 - scan[i] * coef;
-          int g = 255 - abs(ROBOT_RANGE / 2 - scan[i]) * coef;
-          int b = 255 - (ROBOT_RANGE - scan[i]) * coef;
+          int g = 255 - abs(far / 2 - scan[i]) * coef;
+          int b = 255 - (far - scan[i]) * coef;
           leds[i].red = r >= 0 ? r : 0;
           leds[i].green = g >= 0 ? g : 0;
           leds[i].blue = b >= 0 ? b : 0;
@@ -301,9 +313,9 @@ inline void updateFlags(int* _sensors, int nbSensors, bool* obstacle, bool* isRo
 
   for (int index = 0; index < nbSensors; index++) {
     int i = _sensors[index] -1; // Index of the sensor in the sensors array
-    if (obstacle && scan[i] <= AVOID_RANGE)
+    if (obstacle && scan[i] <= near)
       *obstacle = true;
-    if (scan[i] <= ROBOT_RANGE)
+    if (scan[i] <= far)
       *isRobot = true;
   }
 }
