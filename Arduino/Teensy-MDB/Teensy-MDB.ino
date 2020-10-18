@@ -49,7 +49,7 @@ enum leds_modes {
 };
 
 enum leds_modes leds_mode = LOADING;
-float coef = 255.0 / (far / 2);
+float coef = 255.0 / far;
 CRGB led_loading_color = CRGB::Orange; //CRGB::Blue;
 unsigned int led_timer = 0;
 int led_loading_current = 0;
@@ -68,6 +68,8 @@ bool enableWaitingMode = true;
 #define RASPI_I2C Wire1
 #define SLAVE_ADDRESS 0x42
 int data_type = 0;
+
+// --------------------------- Initialisation ----------------------------------
 
 bool init_sensor(int i) {
     
@@ -153,6 +155,8 @@ void setup() {
   if(leds_mode == LOADING)
     enableSensors = false;
 }
+
+// --------------------------- Communication -----------------------------------
 
 void handleRequest() {
 
@@ -249,6 +253,8 @@ void handleReceive(int nBytes) {
   }
 }
 
+// --------------------------- LEDs --------------------------------------------
+
 void manage_leds() {
   
   switch(leds_mode) {
@@ -309,6 +315,8 @@ void manage_leds() {
   FastLED.show();
 }
 
+// --------------------------- Scans -------------------------------------------
+
 inline void updateFlags(int* _sensors, int nbSensors, bool* obstacle, bool* isRobot) {
 
   for (int index = 0; index < nbSensors; index++) {
@@ -352,6 +360,13 @@ void loop() {
     waitingMode();
 
   if(!enableSensors) {
+    
+    for(int i = 0; i < NB_SENSORS; i++)
+      scan[i] = 8191;
+    is_front = false;
+    is_back  = false;
+    is_robot = false;
+    
     manage_leds();
     return;
   }
@@ -410,11 +425,20 @@ void loop() {
   manage_leds();
 }
 
+// --------------------------- Special modes -----------------------------------
+
 // Error mode
 // When the MDB blinks in red it means an error occured
 // The blinking will occur in this order:
 // Full red to show it's an error (500ms)
 // If known, the sensors that failed in yellow (500ms)
+
+void set_leds(CRGB color, int timeMs) {
+  for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
+    leds[i] = color;
+  FastLED.show();
+  delay(timeMs);
+}
 
 // This function stays in error mode forever if the specificSensors parameter is ON (one or more 
 // sensors couldn't be initialised). Or until the raspberrypi disables it by I2C
@@ -425,26 +449,17 @@ void errorMode(bool specificSensors) {
       Serial.println("ERROR MODE #################");
     #endif
 
-    // First blink
-    for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
-      leds[i] = CRGB::Yellow;
-    FastLED.show();
-    delay(500);
-    for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
-      leds[i] = CRGB::Black;
-    FastLED.show();
-    delay(500);
+    set_leds(CRGB::Yellow, 500);
+    set_leds(CRGB::Black, 500);
 
-    // Sensor id
+    // Sensor errors
     if(specificSensors) {
       for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
         leds[i] = failedSensors[i] ? CRGB::Yellow : CRGB::Black;
       FastLED.show();
       delay(1500);
-      for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
-        leds[i] = CRGB::Black;
-      FastLED.show();
-      delay(500);
+      
+      set_leds(CRGB::Black, 500);
     }
   }
 }
@@ -457,14 +472,7 @@ void waitingMode() {
       Serial.println("WAITING MODE #################");
     #endif
 
-    // First blink
-    for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
-      leds[i] = CRGB::Green;
-    FastLED.show();
-    delay(500);
-    for(unsigned int i = 0; i < sizeof(leds)/sizeof(CRGB); i++)
-      leds[i] = CRGB::Black;
-    FastLED.show();
-    delay(500);
+    set_leds(CRGB::Green, 500);
+    set_leds(CRGB::Black, 500);
   }
 }
