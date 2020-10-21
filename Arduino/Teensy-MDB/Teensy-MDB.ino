@@ -449,7 +449,7 @@ void errorMode(bool specificSensors) {
       Serial.println("ERROR MODE #################");
     #endif
 
-    set_leds(CRGB::Yellow, 500);
+    set_leds(CRGB::Red, 500);
     set_leds(CRGB::Black, 500);
 
     // Sensor errors
