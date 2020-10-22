@@ -318,11 +318,14 @@ void manage_leds() {
 // --------------------------- Scans -------------------------------------------
 
 inline void updateFlags(int* _sensors, int nbSensors, bool* obstacle, bool* isRobot) {
-
   for (int index = 0; index < nbSensors; index++) {
     int i = _sensors[index] -1; // Index of the sensor in the sensors array
-    if (obstacle && scan[i] <= near)
-      *obstacle = true;
+    if (obstacle != NULL) {
+      float extrema = 0.75f;
+      float distcoef = abs(index-2)*(extrema-1.0f)/2.0f +1.0f;
+      if(scan[i] <= near*distcoef)
+        *obstacle = true;
+    }
     if (scan[i] <= far)
       *isRobot = true;
   }
@@ -379,9 +382,9 @@ void loop() {
   doSampleScan();
 
   #ifdef DEBUG_SERIAL
-    Serial.print("---- END SCAN -----\n");
     Serial.print("Elapsed time: ");
     Serial.println(millis() - start);
+    Serial.println("---- END SCAN -----");
   #endif
 
   for(int i = 0; i < NB_SENSORS; i++) {
