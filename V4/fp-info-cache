@@ -1,4 +1,4 @@
-19102437736414524
+19120161080255037
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)
@@ -6237,11 +6237,32 @@ ComponentsEvo
 3
 3
 ComponentsEvo
+40x40x10_DC_FAN
+
+
+0
+0
+0
+ComponentsEvo
+440YS67082622
+<B>WS-TATL</B> <BR>Illuminated THT Tact Switch 12 x 12 mm
+
+0
+6
+6
+ComponentsEvo
 8040-PORTE-FUSIBLE
 
 
 0
 4
+2
+ComponentsEvo
+434121050816
+<B>WS-TASV</B><BR>6x3.5 mm SMD Tact Switch, 2 pins
+
+0
+2
 2
 ComponentsEvo
 G2-18v25
@@ -6257,6 +6278,27 @@ MODULE_NUCLEO-F303K8
 0
 30
 30
+ComponentsEvo
+PLCC-4
+
+
+0
+4
+4
+ComponentsEvo
+ShieldRaspberryPi
+
+
+0
+44
+40
+ComponentsEvo
+ShieldRaspberryPiWithOldHeader
+
+
+0
+44
+40
 ComponentsEvo
 T9G
 
@@ -6279,7 +6321,28 @@ UWE
 8
 8
 ComponentsEvo
+WA-BCPH_79527141
+<B>WA-BCPH Battery Holder<BR></B>Battery Type : 2032
+
+0
+3
+3
+ComponentsEvo
+WA-BCPH_79578211
+<B>WA-BCPH Battery Holder<BR></B>Battery Type : 2450
+
+0
+2
+2
+ComponentsEvo
 logo-evo
+
+
+0
+0
+0
+ComponentsEvo
+logo-evo-micro
 
 
 0
@@ -47138,13 +47201,6 @@ ConnectorsEvo
 10
 10
 ConnectorsEvo
-690367281276
-<b>WR-MM</b><br> Female SMT Connector with Polarization, 12 pins
-
-0
-12
-12
-ConnectorsEvo
 691413720002B
 <b>WR-TBL Serie 413B - 5.00 mm Screwless 45° Entry - 3.00 mm 2 Wires <br></b>Max Height = 13mm , Pitch 5mm , 2pins
 
@@ -47165,6 +47221,27 @@ ConnectorsEvo
 0
 3
 3
+ConnectorsEvo
+649004227222
+<B>WR-MPC4 </B><BR>4.20 mm Male Dual Row Angled Header w. Mounting Pegs,4 pins
+
+0
+4
+4
+ConnectorsEvo
+66200221022
+<b>WR-MPC3<br></b>3.00 mm Male Dual Row Angled Header w. Plastic Pegs,2 Pins
+
+0
+2
+2
+ConnectorsEvo
+66200621022
+<b>WR-MPC3<br></b>3.00 mm Male Dual Row Angled Header w. Plastic Pegs, 6 Pins
+
+0
+6
+6
 ConnectorsEvo
 B02B-PASK
 

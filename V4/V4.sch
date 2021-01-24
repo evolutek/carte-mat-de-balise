@@ -876,21 +876,6 @@ Text Label 1500 2500 2    50   ~ 0
 CANH
 Text Label 1500 2600 2    50   ~ 0
 CANL
-$Comp
-L Connector_Generic:Conn_02x06_Odd_Even BUS_EVO1
-U 1 1 5FBC3A79
-P 1200 3950
-F 0 "BUS_EVO1" H 1250 4367 50  0000 C CNN
-F 1 "Conn_02x06_Odd_Even" H 1250 4276 50  0000 C CNN
-F 2 "ConnectorsEvo:690367281276" H 1200 3950 50  0001 C CNN
-F 3 "~" H 1200 3950 50  0001 C CNN
-	1    1200 3950
-	1    0    0    -1  
-$EndComp
-NoConn ~ 1000 3750
-NoConn ~ 1500 3750
-NoConn ~ 1000 3850
-NoConn ~ 1500 3850
 Wire Wire Line
 	1000 4150 750  4150
 Wire Wire Line
@@ -904,7 +889,7 @@ CANH
 Text Label 750  4250 0    50   ~ 0
 CANL
 Text Label 1750 4250 2    50   ~ 0
-RESET
+~RST
 Text Label 1750 4150 2    50   ~ 0
 BAU
 $Comp
@@ -997,11 +982,11 @@ Wire Wire Line
 Wire Wire Line
 	3100 2450 2800 2450
 Text Label 2800 2450 0    50   ~ 0
-RESET
+~RST
 Wire Wire Line
 	4000 2450 4300 2450
 Text Label 4300 2450 2    50   ~ 0
-RESET
+~RST
 $Comp
 L Device:R R6
 U 1 1 5FBE5562
@@ -1016,8 +1001,7 @@ $EndComp
 Wire Wire Line
 	4950 4000 4950 4250
 Text Label 4950 4250 1    50   ~ 0
-RESET
-NoConn ~ 1500 3950
+~RST
 $Comp
 L Connector:Conn_01x03_Male LEDS1
 U 1 1 5FBEB1F5
@@ -1118,17 +1102,6 @@ Wire Wire Line
 Text Label 2800 3250 0    50   ~ 0
 BAU
 NoConn ~ 3100 2750
-$Comp
-L power:+5VP #PWR0101
-U 1 1 5FBFFF13
-P 3050 5750
-F 0 "#PWR0101" H 3050 5600 50  0001 C CNN
-F 1 "+5VP" H 3065 5923 50  0000 C CNN
-F 2 "" H 3050 5750 50  0001 C CNN
-F 3 "" H 3050 5750 50  0001 C CNN
-	1    3050 5750
-	-1   0    0    1   
-$EndComp
 $Comp
 L Device:C C3
 U 1 1 5FC1955B
@@ -1253,13 +1226,13 @@ $EndComp
 $Comp
 L power:+5V #PWR015
 U 1 1 5FC5BA58
-P 1000 3950
-F 0 "#PWR015" H 1000 3800 50  0001 C CNN
-F 1 "+5V" V 1015 4078 50  0000 L CNN
-F 2 "" H 1000 3950 50  0001 C CNN
-F 3 "" H 1000 3950 50  0001 C CNN
-	1    1000 3950
-	0    -1   -1   0   
+P 1500 3850
+F 0 "#PWR015" H 1500 3700 50  0001 C CNN
+F 1 "+5V" V 1515 3978 50  0000 L CNN
+F 2 "" H 1500 3850 50  0001 C CNN
+F 3 "" H 1500 3850 50  0001 C CNN
+	1    1500 3850
+	0    1    1    0   
 $EndComp
 $Comp
 L power:GNDS #PWR029
@@ -1425,4 +1398,29 @@ Wire Notes Line
 	2000 1600 5450 1600
 Wire Notes Line
 	2000 500  5450 500 
+$Comp
+L Connector_Generic:Conn_02x05_Odd_Even BUS_EVO1
+U 1 1 5FF0C968
+P 1200 4050
+F 0 "BUS_EVO1" H 1250 4467 50  0000 C CNN
+F 1 "Conn_02x05_Odd_Even" H 1250 4376 50  0000 C CNN
+F 2 "ConnectorsEvo:690367281076" H 1200 4050 50  0001 C CNN
+F 3 "~" H 1200 4050 50  0001 C CNN
+	1    1200 4050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR024
+U 1 1 5FF0E908
+P 3050 5750
+F 0 "#PWR024" H 3050 5600 50  0001 C CNN
+F 1 "+5V" H 3000 5900 50  0000 L CNN
+F 2 "" H 3050 5750 50  0001 C CNN
+F 3 "" H 3050 5750 50  0001 C CNN
+	1    3050 5750
+	-1   0    0    1   
+$EndComp
+NoConn ~ 1000 3850
+NoConn ~ 1000 3950
+NoConn ~ 1500 3950
 $EndSCHEMATC
