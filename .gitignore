@@ -20,7 +20,6 @@ eagle.epf
 *.scr
 
 # Autorouter files
-*.pro
 *.job
 
 # CAM files
@@ -60,4 +59,32 @@ eagle.epf
 *.lck
 
 #.scr
-CarteIO V1/Schematics_2019-01-11.zip
+
+# For PCBs designed using KiCad: http://www.kicad-pcb.org/
+# Format documentation: http://kicad-pcb.org/help/file-formats/
+
+# Temporary files
+*.000
+*.bak
+*.bck
+*.kicad_pcb-bak
+*.kicad_sch-bak
+*.kicad_prl
+*.sch-bak
+*~
+_autosave-*
+*.tmp
+*-save.pro
+*-save.kicad_pcb
+fp-info-cache
+
+# Netlist files (exported from Eeschema)
+*.net
+
+# Autorouter files (exported from Pcbnew)
+*.dsn
+*.ses
+
+# Exported BOM files
+*.xml
+*.csv
