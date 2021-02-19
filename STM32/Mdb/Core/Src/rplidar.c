@@ -1,4 +1,5 @@
 #include "rplidar.h"
+#include "main.h"
 
 #define LIDAR_REQUEST 0xA5
 
@@ -11,7 +12,7 @@ void lidar_init(UART_HandleTypeDef* uart) {
 	serial = uart;
 }
 
-void lidar_send_commeand(uint8_t command) {
+void lidar_send_command(uint8_t command) {
 	uint8_t cmd[2] = { LIDAR_REQUEST, command};
-	HAL_UART_Transmit(serial, command, 2, 0xFFFF);
+	HAL_UART_Transmit(serial, cmd, 2, 0xFFFF);
 }
