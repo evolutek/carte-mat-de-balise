@@ -1,14 +1,3 @@
-# STM32Cube copied library and project folders
-Drivers/*
-MDK-ARM/*
-EWARM/*
-# CrossWorks project files
-!*/*.hzp
-!*/*.hzs
-
-*.o
-.mxproject
-
 # Object files
 *.o
 *.ko
@@ -53,4 +42,7 @@ EWARM/*
 *~
 
 # Libraries
-/lib
+lib/
+
+Debug/
+Drivers/
