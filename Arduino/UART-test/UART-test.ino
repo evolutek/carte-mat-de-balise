@@ -1,20 +1,28 @@
 #include <SoftwareSerial.h>
 
-SoftwareSerial serial(2, 3); // RX, TX
+#define NUCLEO Serial1
+#define LIDAR Serial2
 
 void setup() {
   Serial.begin(115200);
+  NUCLEO.begin(115200);
+  LIDAR.begin(115200)
   while (!Serial);
+  while (!NUCLEO);
+  while (!LIDAR);
 
   Serial.println("Ready");
-
-  serial.begin(115200);
 }
 
 void loop() {
-  if (serial.available()) {
-    Serial.print("0x");
-    Serial.print(String(serial.read(), HEX));
-    Serial.println();
+  if (NUCLEO.available()) {
+    NUCLEO.print("Nucleo: 0x");
+    NUCLEO.print(String(Serial.read(), HEX));
+    NUCLEO.println();
+  }
+  if (LIDAR.available()) {
+    LIDAR.print("Lidar: 0x");
+    LIDAR.print(String(Serial.read(), HEX));
+    LIDAR.println();
   }
 }
