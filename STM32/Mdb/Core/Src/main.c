@@ -23,8 +23,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "rplidar.h"
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -64,17 +62,60 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// Redirects printf to uart1 (The write syscall is in syscalls.c)
 #include "stdio.h"
 int __io_putchar(int ch)
 {
-	HAL_UART_Transmit(&huart2, (uint8_t*) &ch, 1, 0xFFFF);
-	return ch;
+  HAL_UART_Transmit(&huart2, (uint8_t*) &ch, 1, 0xFFFF);
+  return ch;
 }
 int __io_getchar(void)
 {
-	int ch;
-	HAL_UART_Receive(&huart2, (uint8_t*) &ch, 1, 0xFFFF);
-	return ch;
+  int ch;
+  HAL_UART_Receive(&huart2, (uint8_t*) &ch, 1, 0xFFFF);
+  return ch;
+}
+
+#define LIDAR_SYNC_BYTE  0xA5
+#define LIDAR_START_SCAN 0x20
+#define LIDAR_STOP_SCAN  0x25
+#define LIDAR_RESET      0x40
+#define LIDAR_INFO       0x50
+#define LIDAR_HEALTH     0x52
+#define LIDAR_S_FLAG     0x01
+#define LIDAR_NS_FLAG    0x02
+#define LIDAR_C_FLAG     0x01
+
+struct scan {
+  int newScan;    // 1 for the first packet of each new turn
+  int quality;    // 0-63
+  float angle;    // degrees
+  float distance; // mm
+};
+
+int lidar_send_command(uint8_t c) {
+  uint8_t cmd[2] = { LIDAR_SYNC_BYTE, c };
+  return HAL_UART_Transmit(&huart1, cmd, 2, 0xFFFF);
+}
+
+void lidar_receive(uint8_t* buf, int length) {
+  HAL_UART_Receive(&huart1, buf, length, 0xFFFF);
+  for(int i = 0; i < length; i++)
+     printf("%02x", buf[i]);
+  printf("\r\n");
+}
+
+int lidar_decode(struct scan* s, uint8_t* raw) {
+  s->newScan = raw[0] & LIDAR_S_FLAG;
+  // Sanity check
+  if(!(raw[1] & LIDAR_C_FLAG) || !!(raw[0] & LIDAR_NS_FLAG) == s->newScan)
+     return 0;
+  s->quality = raw[0] >> 2;
+  // angle = raw_value/64.0
+  s->angle = (float)(((uint16_t)raw[1] >> 1) | ((uint16_t)raw[2] << 7))/64.0f;
+  // distance = raw_value/4.0
+  s->distance = (float)((uint16_t)raw[3] | ((uint16_t)raw[4] << 8))/4.0f;
+  return 1;
 }
 
 /* USER CODE END 0 */
@@ -86,7 +127,7 @@ int __io_getchar(void)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  uint8_t buf[64];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -112,7 +153,26 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  lidar_init(&huart1);
+  printf("\r\n");
+  printf("\r\n");
+
+  // Flushes the UART receive buffer
+  HAL_UART_Receive(&huart1, buf, 64, 0xFF);
+
+  printf("Sending Info request...\r\n");
+  lidar_send_command(LIDAR_INFO);
+  lidar_receive(buf, 27);
+  printf("Sending Health request...\r\n");
+  lidar_send_command(LIDAR_HEALTH);
+  lidar_receive(buf, 10);
+
+  // Makes the lidar turn
+  HAL_GPIO_WritePin(MCTL_GPIO_Port, MCTL_Pin, GPIO_PIN_SET);
+
+  printf("Starting scan\r\n");
+  lidar_send_command(LIDAR_START_SCAN);
+  lidar_receive(buf, 7);
+  // Should be A5 5A 05 00 00 40 81
 
   /* USER CODE END 2 */
 
@@ -124,14 +184,18 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	printf("Sending. ");
-	lidar_send_command(0x50);//LIDAR_START_SCAN);
-	while(1) {
-		uint8_t in;
-		HAL_UART_Receive(&huart1, &in, 1, 0xFF);
-		printf("%x", in);
-	}
-	//HAL_Delay(1000000);
+    HAL_UART_Receive(&huart1, buf, 5, 0xFFFF);
+    for(int i = 0; i < 5; i++)
+      printf("%02x", buf[i]);
+    printf(": ");
+
+    struct scan s;
+    if(!lidar_decode(&s, buf)) {
+	printf("Error while decoding lidar output\r\n");
+	continue;
+    }
+
+    printf("Distance: %i, Angle: %i, Quality: %i\r\n", (int)s.distance, (int)s.angle, s.quality);
   }
   /* USER CODE END 3 */
 }
