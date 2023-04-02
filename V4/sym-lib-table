@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name V4-rescue)(type Legacy)(uri ${KIPRJMOD}/V4-rescue.lib)(options "")(descr ""))
-)
