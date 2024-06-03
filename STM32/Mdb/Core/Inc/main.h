@@ -7,13 +7,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2024 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -28,7 +27,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f3xx_hal.h"
+#include "stm32g4xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -37,7 +36,8 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -50,6 +50,8 @@ extern "C" {
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -58,18 +60,33 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define MCO_Pin GPIO_PIN_0
-#define MCO_GPIO_Port GPIOF
-#define BAU_Pin GPIO_PIN_1
-#define BAU_GPIO_Port GPIOF
-#define MCTL_Pin GPIO_PIN_6
-#define MCTL_GPIO_Port GPIOA
-#define LEDS_Pin GPIO_PIN_7
+#define LEDS_Pin GPIO_PIN_0
 #define LEDS_GPIO_Port GPIOA
-#define SWDIO_Pin GPIO_PIN_13
-#define SWDIO_GPIO_Port GPIOA
-#define SWCLK_Pin GPIO_PIN_14
-#define SWCLK_GPIO_Port GPIOA
+#define VCP_RX_Pin GPIO_PIN_2
+#define VCP_RX_GPIO_Port GPIOA
+#define VCP_TX_Pin GPIO_PIN_3
+#define VCP_TX_GPIO_Port GPIOA
+#define AU_Pin GPIO_PIN_7
+#define AU_GPIO_Port GPIOA
+#define LIDAR_PWM_Pin GPIO_PIN_8
+#define LIDAR_PWM_GPIO_Port GPIOA
+#define LIDAR_TX_Pin GPIO_PIN_9
+#define LIDAR_TX_GPIO_Port GPIOA
+#define LIDAR_RX_Pin GPIO_PIN_10
+#define LIDAR_RX_GPIO_Port GPIOA
+#define CAN_RX_Pin GPIO_PIN_11
+#define CAN_RX_GPIO_Port GPIOA
+#define CAN_TX_Pin GPIO_PIN_12
+#define CAN_TX_GPIO_Port GPIOA
+#define T_SWDIO_Pin GPIO_PIN_13
+#define T_SWDIO_GPIO_Port GPIOA
+#define T_SWCLK_Pin GPIO_PIN_14
+#define T_SWCLK_GPIO_Port GPIOA
+#define T_SWO_Pin GPIO_PIN_3
+#define T_SWO_GPIO_Port GPIOB
+#define STATUS_Pin GPIO_PIN_8
+#define STATUS_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -79,5 +96,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
