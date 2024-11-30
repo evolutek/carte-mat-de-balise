@@ -15,7 +15,7 @@
 /* Request -------------------------------------------------------------------*/
 void new_req(UART_HandleTypeDef *huart, const uint8_t cmd) {
 	request req_struct;
-	req_struct.start_flag = START1;
+	req_struct.start_flag = START_FLAG1;
 	req_struct.command = cmd;
 	if (cmd > 0x80) {
 		//todo
@@ -40,7 +40,7 @@ void get_res_descriptor(UART_HandleTypeDef *huart, uint8_t *pData) {
 	HAL_UART_Receive(huart, pData, 7, 1000);
 }
 void get_res_data(UART_HandleTypeDef *huart, uint8_t *pData, descriptor *res_desc) {
-	uint16_t data_size = res_desc->res_length_type; // TODO #2
+//	uint16_t data_size = res_desc->res_length_type; // TODO #2
 	//HAL_UART_Receive(huart, pData, data_size, 1000);
 	HAL_UART_Receive(huart, pData, 5, 1000);
 }

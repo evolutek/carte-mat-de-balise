@@ -126,8 +126,8 @@ int main(void)
 
   char on[]  	= "On";
   char off[] 	= "Off";
-  char error[]	= "error";
-  char req[]	= "request";
+  char error[]	= "Error";
+  char req[]	= "Request";
   char desc[] 	= "Descriptor";
   char scan[] 	= "Scanning";
 
@@ -158,7 +158,7 @@ int main(void)
 			  // Request
 			  printf("%s\n\r", req);
 			  request scan_request;
-			  scan_request.start_flag = START1;
+			  scan_request.start_flag = START_FLAG1;
 			  scan_request.command = SCAN;
 			  HAL_UART_Transmit(&huart1, (uint8_t *)&scan_request, sizeof(scan_request), 100);
 
@@ -170,22 +170,22 @@ int main(void)
 			  printf("%s\n\r", desc);
 			  descriptor scan_desc;
 			  ringbuffer_read_exactly(&ringBuffer, (uint8_t *)&scan_desc, sizeof(scan_desc));
-//			  HAL_UART_Receive(&huart1, (uint8_t *)&scan_desc, sizeof(scan_desc), 100);
 
 			  // Check descriptor fields
-			  if (scan_desc.start_flag1 != START1){
+			  if (scan_desc.start_flag1 != START_FLAG1){
 				  printf("%s: start1\n\r", error);
+				  HAL_Delay(1000);
 				  state_lidar = REQUEST;
 			  }
-			  else if (scan_desc.start_flag2 != START2) {
+			  else if (scan_desc.start_flag2 != START_FLAG2) {
 				  printf("%s: start2\n\r", error);
 				  state_lidar = REQUEST;
 			  }
-			  else if (scan_desc.res_length_type != 0x40000005) {
+			  else if (scan_desc.res_length_mode != RES_LENGTH_MODE) {
 				  printf("%s: length\n\r", error);
 				  state_lidar = REQUEST;
 			  }
-			  else if (scan_desc.type != 0x81) {
+			  else if (scan_desc.type != DATA_TYPE) {
 				  printf("%s: type\n\r", error);
 				  state_lidar = REQUEST;
 			  }
@@ -200,7 +200,7 @@ int main(void)
 			  HAL_UART_Receive(&huart1, (uint8_t *)&frame, sizeof(frame), 100);
 
 			  // Check S, _S and C check bits
-			  if (!CHECK_BIT(frame.angle_q6, 0)) {
+			  if (!CHECK_BIT(frame.angle_q6, 1)) {
 				  printf("%s: C check bit\n\r", error);
 				  state_lidar = REQUEST;
 			  }
@@ -523,12 +523,6 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(STATUS_GPIO_Port, STATUS_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : TEST_Pin */
-  GPIO_InitStruct.Pin = TEST_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(TEST_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : AU_Pin */
   GPIO_InitStruct.Pin = AU_Pin;

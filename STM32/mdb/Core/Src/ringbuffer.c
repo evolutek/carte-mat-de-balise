@@ -1,4 +1,5 @@
 #include <ringbuffer.h>
+#include <stdio.h>
 
 void ringbuffer_init(ringbuffer_t* buffer, uint8_t* data, uint32_t max_size) {
     buffer->data = data;
@@ -47,8 +48,6 @@ uint32_t ringbuffer_get_size(ringbuffer_t* buffer) {
 }
 
 uint32_t ringbuffer_read(ringbuffer_t* buffer, uint8_t *data, uint32_t max_size) {
-    uint32_t i = 0;
-
     if (ringbuffer_get_lost_bytes(buffer)) {
     	printf("DMA ERROR: lost bytes\n\r");
     }

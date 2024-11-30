@@ -17,9 +17,8 @@
 
 /******************************** PAQUET FIELDS *******************************/
 /* Start field ---------------------------------------------------------------*/
-#define START1 			0xA5
-#define START2 			0x5A
-
+#define START_FLAG1		0xA5
+#define START_FLAG2		0x5A
 
 /* Command field -------------------------------------------------------------*/
 /* No response */
@@ -36,6 +35,10 @@
 #define GET_HEALTH 		0x52
 #define GET_SAMPLERATE 	0x59
 #define GET_LIDAR_CONF 	0x84	/* Payload */
+
+/* Descriptor field ----------------------------------------------------------*/
+#define	RES_LENGTH_MODE 0x40000005
+#define DATA_TYPE		0x81
 
 /* MACROS --------------------------------------------------------------------*/
 #define CHECK_BIT(var, pos) ((var) & (1<<(pos)))
@@ -56,7 +59,7 @@ typedef struct Request {
 typedef struct Descriptor {
 	uint8_t	start_flag1;		/* Mandatory (=START1) ----------------------*/
 	uint8_t start_flag2;		/* Mandatory (=START2) ----------------------*/
-	uint32_t res_length_type;	/* Mandatory (30b res length + 2b send mode) */
+	uint32_t res_length_mode;	/* Mandatory (30b res length + 2b send mode) */
 	uint8_t type;				/* Mandatory --------------------------------*/
 } __attribute__((__packed__)) descriptor;
 
