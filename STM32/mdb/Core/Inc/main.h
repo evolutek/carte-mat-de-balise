@@ -66,6 +66,8 @@ void Error_Handler(void);
 #define VCP_RX_GPIO_Port GPIOA
 #define VCP_TX_Pin GPIO_PIN_3
 #define VCP_TX_GPIO_Port GPIOA
+#define TEST_Pin GPIO_PIN_6
+#define TEST_GPIO_Port GPIOA
 #define AU_Pin GPIO_PIN_7
 #define AU_GPIO_Port GPIOA
 #define LIDAR_PWM_Pin GPIO_PIN_8

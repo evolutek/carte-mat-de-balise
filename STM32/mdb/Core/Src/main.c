@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "rplidar.h"
+#include "ringbuffer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +47,7 @@ TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
+DMA_HandleTypeDef hdma_usart1_rx;
 
 /* USER CODE BEGIN PV */
 
@@ -54,6 +56,7 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_FDCAN1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_USART1_UART_Init(void);
@@ -64,7 +67,21 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint8_t UART1_rxBuffer[512] = {0};
+ringbuffer_t ringBuffer;
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+	ringbuffer_dma_add_overflow(&ringBuffer);
+}
+
+void ringbuffer_read_exactly(ringbuffer_t* buffer, uint8_t *data, uint32_t max_size) {
+	uint32_t i = 0;
+
+	while (i < max_size) {
+		ringbuffer_dma_set_written_size(buffer, 512 - huart1.hdmarx->Instance->CNDTR);
+		i += ringbuffer_read(buffer, &data[i], max_size - i);
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -74,7 +91,6 @@ static void MX_USART2_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -95,24 +111,29 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_FDCAN1_Init();
   MX_TIM2_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_SET);
-
-  HAL_Delay(2000);
-// TODO #1
-//  HAL_Delay(2000);
-//  lidar_conf_data lidar_conf = get_lidar_conf(&huart1);
-
-  HAL_Delay(2000);
+  // init ringbuffer and DMA receiving
+  ringbuffer_init(&ringBuffer, UART1_rxBuffer, 512);
+  HAL_UART_Receive_DMA(&huart1, UART1_rxBuffer, 512);
 
   HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, 0);
 
+  char on[]  	= "On";
+  char off[] 	= "Off";
+  char error[]	= "error";
+  char req[]	= "request";
+  char desc[] 	= "Descriptor";
+  char scan[] 	= "Scanning";
 
+  enum state_scan state_lidar = STANDBY;
+  scan_data sample[1000];
+  uint16_t index = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -122,21 +143,109 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin)) {
-		  HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_SET);
+	  if (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin) != GPIO_PIN_RESET) {
+		  switch (state_lidar)
+		  {
+		  case STANDBY:
+			  // Start Lidar rotation (PWM pin -> on)
+			  printf("%s\n\r", on);
+			  HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_SET);
 
-		  // start scanning
-		  descriptor res_desc;
-		  scan_data res_data;
-		  start_scan(&huart1, &res_desc);
+			  state_lidar = REQUEST;
+			  break;
 
-		  while (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin)) {
-			  get_res_data(&huart1, &res_data, &res_desc);
-			  HAL_UART_Transmit(&huart2, (uint8_t *)&res_data, sizeof(res_data), 500);
+		  case REQUEST:
+			  // Request
+			  printf("%s\n\r", req);
+			  request scan_request;
+			  scan_request.start_flag = START1;
+			  scan_request.command = SCAN;
+			  HAL_UART_Transmit(&huart1, (uint8_t *)&scan_request, sizeof(scan_request), 100);
+
+			  state_lidar = DESCRIPTOR;
+			  break;
+
+		  case DESCRIPTOR:
+			  // Read descriptor
+			  printf("%s\n\r", desc);
+			  descriptor scan_desc;
+			  ringbuffer_read_exactly(&ringBuffer, (uint8_t *)&scan_desc, sizeof(scan_desc));
+//			  HAL_UART_Receive(&huart1, (uint8_t *)&scan_desc, sizeof(scan_desc), 100);
+
+			  // Check descriptor fields
+			  if (scan_desc.start_flag1 != START1){
+				  printf("%s: start1\n\r", error);
+				  state_lidar = REQUEST;
+			  }
+			  else if (scan_desc.start_flag2 != START2) {
+				  printf("%s: start2\n\r", error);
+				  state_lidar = REQUEST;
+			  }
+			  else if (scan_desc.res_length_type != 0x40000005) {
+				  printf("%s: length\n\r", error);
+				  state_lidar = REQUEST;
+			  }
+			  else if (scan_desc.type != 0x81) {
+				  printf("%s: type\n\r", error);
+				  state_lidar = REQUEST;
+			  }
+			  else
+				  state_lidar = SCANNING; // Everything fine !
+
+			  break;
+
+		  case SCANNING:
+			  printf("%s\n\r", scan);
+			  scan_data frame;
+			  HAL_UART_Receive(&huart1, (uint8_t *)&frame, sizeof(frame), 100);
+
+			  // Check S, _S and C check bits
+			  if (!CHECK_BIT(frame.angle_q6, 0)) {
+				  printf("%s: C check bit\n\r", error);
+				  state_lidar = REQUEST;
+			  }
+			  else if (CHECK_BIT(frame.quality, 0) == CHECK_BIT(frame.quality, 1)) {
+				  printf("%s: S check bits unsynch\n\r", error);
+				  state_lidar = REQUEST;
+			  }
+			  else {
+				  // Send sample if 1st sample (S=1)
+				  if (CHECK_BIT(frame.quality, 0)) {
+					  // Interrupt sample
+					  index = 0;
+					  sample[index++] = frame;
+				  }
+				  else
+					  sample[index++] = frame;
+			  }
+
+			  break;
+
+		  default:
+			  printf("%s\n\r", error);
+			  state_lidar = REQUEST;
+
+			  break;
 		  }
 
-		  stop(&huart1);
-		  HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, 0);
+		  // start scanning
+//		  scan_data res_data;
+//		  HAL_Delay(500);
+//
+//		  while (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin)) {
+//			  get_res_data(&huart1, (uint8_t *)&res_data, &res_desc);
+//			  HAL_Delay(100);
+//			  HAL_UART_Transmit(&huart2, (uint8_t *)&res_data, (uint16_t)sizeof(res_data), 500);
+//			  HAL_Delay(100);
+//			  HAL_UART_Transmit(&huart2, (uint8_t *)"\n\r", 2, 500);
+//			  HAL_Delay(100);
+//		  }
+		  if (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin) == GPIO_PIN_RESET) {
+			  printf("%s\n\r", off);
+			  HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_RESET);
+			  stop(&huart1);
+			  state_lidar = STANDBY;
+		  }
 	  }
   }
 
@@ -345,7 +454,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
+  huart2.Init.BaudRate = 1000000;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -378,6 +487,23 @@ static void MX_USART2_UART_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMAMUX1_CLK_ENABLE();
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -397,6 +523,12 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(STATUS_GPIO_Port, STATUS_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : TEST_Pin */
+  GPIO_InitStruct.Pin = TEST_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(TEST_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : AU_Pin */
   GPIO_InitStruct.Pin = AU_Pin;

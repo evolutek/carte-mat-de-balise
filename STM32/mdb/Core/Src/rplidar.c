@@ -18,17 +18,17 @@ void new_req(UART_HandleTypeDef *huart, const uint8_t cmd) {
 	req_struct.start_flag = START1;
 	req_struct.command = cmd;
 	if (cmd > 0x80) {
-
+		//todo
 	}
 	HAL_UART_Transmit(huart, (uint8_t *)&req_struct, sizeof(req_struct), 100);
 }
 void start_scan(UART_HandleTypeDef *huart, descriptor *res_desc) {
 	new_req(huart, SCAN);
-	get_res_descriptor(huart, (uint8_t *)&res_desc);
+	get_res_descriptor(huart, (uint8_t *)res_desc);
 }
 void start_force_scan(UART_HandleTypeDef *huart, descriptor *res_desc) {
 	new_req(huart, FORCE_SCAN);
-	get_res_descriptor(huart, (uint8_t *)&res_desc);
+	get_res_descriptor(huart, (uint8_t *)res_desc);
 }
 void start_express_scan(UART_HandleTypeDef *huart, uint8_t payload, descriptor *res_desc) {
 	// TODO #1
@@ -40,8 +40,9 @@ void get_res_descriptor(UART_HandleTypeDef *huart, uint8_t *pData) {
 	HAL_UART_Receive(huart, pData, 7, 1000);
 }
 void get_res_data(UART_HandleTypeDef *huart, uint8_t *pData, descriptor *res_desc) {
-	uint16_t data_size = res_desc.res_length_type; // TODO #2
-	HAL_UART_Receive(huart, pData, data_size, 1000);
+	uint16_t data_size = res_desc->res_length_type; // TODO #2
+	//HAL_UART_Receive(huart, pData, data_size, 1000);
+	HAL_UART_Receive(huart, pData, 5, 1000);
 }
 
 /* No response */
@@ -53,11 +54,11 @@ void reset(UART_HandleTypeDef *huart) {
 }
 
 /* Multiple response */
-scan_pack get_scan(UART_HandleTypeDef *huart) {
-
-}
-scan_pack force_scan(UART_HandleTypeDef *huart);
-express_scan_data *get_express_scan(UART_HandleTypeDef *huart);
+//scan_pack get_scan(UART_HandleTypeDef *huart) {
+//
+//}
+//scan_pack force_scan(UART_HandleTypeDef *huart);
+//express_scan_data *get_express_scan(UART_HandleTypeDef *huart);
 
 
 /* Single response */

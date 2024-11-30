@@ -37,6 +37,12 @@
 #define GET_SAMPLERATE 	0x59
 #define GET_LIDAR_CONF 	0x84	/* Payload */
 
+/* MACROS --------------------------------------------------------------------*/
+#define CHECK_BIT(var, pos) ((var) & (1<<(pos)))
+
+/* State Machines ------------------------------------------------------------*/
+enum state_scan { STANDBY, REQUEST, DESCRIPTOR, SCANNING};
+
 
 /* Request packet format -----------------------------------------------------*/
 typedef struct Request {
