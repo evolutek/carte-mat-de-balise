@@ -41,7 +41,7 @@
 #define DATA_TYPE		0x81
 
 /* MACROS --------------------------------------------------------------------*/
-#define CHECK_BIT(var, pos) ((var) & (1<<(pos)))
+#define CHECK_BIT(var, pos) (((var) & (1U << (pos))) != 0)
 
 /* State Machines ------------------------------------------------------------*/
 enum state_scan { STANDBY, REQUEST, DESCRIPTOR, SCANNING};

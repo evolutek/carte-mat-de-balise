@@ -5,7 +5,7 @@ typedef struct ringbuffer_s {
     uint32_t max_size;
     uint32_t start;
     uint32_t size;
-    int32_t nb_overflows;
+    volatile int32_t nb_overflows;
 } ringbuffer_t;
 
 void ringbuffer_init(ringbuffer_t* buffer, uint8_t* data, uint32_t max_size);

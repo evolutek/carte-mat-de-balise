@@ -9,10 +9,23 @@ void ringbuffer_init(ringbuffer_t* buffer, uint8_t* data, uint32_t max_size) {
     buffer->size = 0;
 }
 
+void ringbuffer_dma_reset(ringbuffer_t* buffer, uint32_t size) {
+    buffer->nb_overflows = 0;
+    buffer->start = size;
+}
+
 // The number of bytes written inside the DMA buffer from the index 0
 void ringbuffer_dma_set_written_size(ringbuffer_t* buffer, uint32_t size) {
-    if (buffer->nb_overflows > 0) {
-        buffer->size = buffer->max_size - buffer->start + size + (buffer->nb_overflows - 1) * buffer->max_size;
+    if (buffer->nb_overflows == 1) {
+        if (buffer->start < size) {
+        	ringbuffer_dma_reset(buffer, size);
+        	printf("A\n\r");
+        } else {
+            buffer->size = buffer->max_size - buffer->start + size;
+        }
+    } else if (buffer->nb_overflows > 1){
+    	ringbuffer_dma_reset(buffer, size);
+    	printf("B\n\r");
     } else if (buffer->nb_overflows < 0) {
         // Here ringbuffer_dma_add_overflow has not yet been called but buffer->start has go back to 0
         if (size < buffer->start) {
@@ -40,7 +53,7 @@ uint32_t ringbuffer_get_lost_bytes(ringbuffer_t* buffer) {
     if (buffer->size < buffer->max_size) {
         return 0;
     }
-    return buffer->max_size - buffer->size;
+    return buffer->size - buffer->max_size;
 }
 
 uint32_t ringbuffer_get_size(ringbuffer_t* buffer) {
@@ -48,15 +61,21 @@ uint32_t ringbuffer_get_size(ringbuffer_t* buffer) {
 }
 
 uint32_t ringbuffer_read(ringbuffer_t* buffer, uint8_t *data, uint32_t max_size) {
-    if (ringbuffer_get_lost_bytes(buffer)) {
-    	printf("DMA ERROR: lost bytes\n\r");
+	int32_t lost_bytes = ringbuffer_get_lost_bytes(buffer);
+    if (lost_bytes) {
+    	printf("DMA ERROR: lost %ld bytes\n\r", lost_bytes);
+    	printf("max_size=%ld, nb_overflow=%ld\n\r", max_size, buffer->nb_overflows);
     }
 
     uint32_t to_read = buffer->size;
+    // Check if nb bytes > bytes user wants to read
     if (to_read > max_size) {
         to_read = max_size;
     }
 
+    buffer->size -= to_read;
+
+    // nb bytes > ringbuffer
     if (to_read > buffer->max_size) {
         to_read = buffer->max_size;
     }

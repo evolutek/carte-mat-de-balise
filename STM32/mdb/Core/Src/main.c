@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "rplidar.h"
 #include "ringbuffer.h"
+#include "byteswap.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,11 +68,12 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t UART1_rxBuffer[512] = {0};
+volatile uint8_t UART1_rxBuffer[1024] = {0};
 ringbuffer_t ringBuffer;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	ringbuffer_dma_add_overflow(&ringBuffer);
+//	printf("reste: %u\n\r", (unsigned)(512 - huart1.hdmarx->Instance->CNDTR));
 }
 
 void ringbuffer_read_exactly(ringbuffer_t* buffer, uint8_t *data, uint32_t max_size) {
@@ -82,6 +84,10 @@ void ringbuffer_read_exactly(ringbuffer_t* buffer, uint8_t *data, uint32_t max_s
 		i += ringbuffer_read(buffer, &data[i], max_size - i);
 	}
 }
+
+request scan_request;
+descriptor scan_desc;
+scan_data frame;
 /* USER CODE END 0 */
 
 /**
@@ -132,6 +138,7 @@ int main(void)
   char scan[] 	= "Scanning";
 
   enum state_scan state_lidar = STANDBY;
+
   scan_data sample[1000];
   uint16_t index = 0;
   /* USER CODE END 2 */
@@ -157,7 +164,6 @@ int main(void)
 		  case REQUEST:
 			  // Request
 			  printf("%s\n\r", req);
-			  request scan_request;
 			  scan_request.start_flag = START_FLAG1;
 			  scan_request.command = SCAN;
 			  HAL_UART_Transmit(&huart1, (uint8_t *)&scan_request, sizeof(scan_request), 100);
@@ -168,13 +174,11 @@ int main(void)
 		  case DESCRIPTOR:
 			  // Read descriptor
 			  printf("%s\n\r", desc);
-			  descriptor scan_desc;
 			  ringbuffer_read_exactly(&ringBuffer, (uint8_t *)&scan_desc, sizeof(scan_desc));
 
 			  // Check descriptor fields
 			  if (scan_desc.start_flag1 != START_FLAG1){
 				  printf("%s: start1\n\r", error);
-				  HAL_Delay(1000);
 				  state_lidar = REQUEST;
 			  }
 			  else if (scan_desc.start_flag2 != START_FLAG2) {
@@ -196,11 +200,13 @@ int main(void)
 
 		  case SCANNING:
 			  printf("%s\n\r", scan);
-			  scan_data frame;
-			  HAL_UART_Receive(&huart1, (uint8_t *)&frame, sizeof(frame), 100);
-
+			  ringbuffer_read_exactly(&ringBuffer, (uint8_t *)&frame, sizeof(frame));
+//			  frame.angle_q6 = swap_uint16(frame.angle_q6);
+//			  frame.distance_q2 = swap_uint16(frame.distance_q2);
+//			  printf("angle: %u\n\r", (unsigned)(frame.angle_q6));
+//			  break;
 			  // Check S, _S and C check bits
-			  if (!CHECK_BIT(frame.angle_q6, 1)) {
+			  if (!CHECK_BIT(frame.angle_q6, 0)) {
 				  printf("%s: C check bit\n\r", error);
 				  state_lidar = REQUEST;
 			  }
@@ -263,7 +269,7 @@ void SystemClock_Config(void)
 
   /** Configure the main internal regulator output voltage
   */
-  HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1_BOOST);
+  HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -273,8 +279,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV4;
-  RCC_OscInitStruct.PLL.PLLN = 85;
+  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV1;
+  RCC_OscInitStruct.PLL.PLLN = 8;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -292,7 +298,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
