@@ -200,7 +200,8 @@ int main(void)
 			  break;
 
 		  case SCANNING:
-			  HAL_Delay(1);
+			  // TODO: wtf, remove please
+			  for(volatile int i = 0; i < 200; i++);
 //			  printf("%s\n\r", scan);
 			  ringbuffer_read_exactly(&ringBuffer, (uint8_t *)&frame, sizeof(frame));
 //			  frame.angle_q6 = swap_uint16(frame.angle_q6);
