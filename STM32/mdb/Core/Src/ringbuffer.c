@@ -1,3 +1,4 @@
+#include "main.h"
 #include <ringbuffer.h>
 #include <stdio.h>
 
@@ -9,37 +10,38 @@ void ringbuffer_init(ringbuffer_t* buffer, uint8_t* data, uint32_t max_size) {
     buffer->size = 0;
 }
 
-void ringbuffer_dma_reset(ringbuffer_t* buffer, uint32_t size) {
+void ringbuffer_dma_reset(ringbuffer_t* buffer, uint32_t dma_index) {
     buffer->nb_overflows = 0;
-    buffer->start = size;
+    buffer->start = dma_index;
 }
 
 // The number of bytes written inside the DMA buffer from the index 0
-void ringbuffer_dma_set_written_size(ringbuffer_t* buffer, uint32_t size) {
+void ringbuffer_dma_set_written_size(ringbuffer_t* buffer, uint32_t dma_index) {
     if (buffer->nb_overflows == 1) {
-        if (buffer->start < size) {
-        	ringbuffer_dma_reset(buffer, size);
+        if (buffer->start < dma_index) {
+//        	ringbuffer_dma_reset(buffer, dma_index);
+            buffer->size = buffer->max_size * 2 - buffer->start;
         	printf("A\n\r");
         } else {
-            buffer->size = buffer->max_size - buffer->start + size;
+            buffer->size = buffer->max_size - buffer->start + dma_index;
         }
     } else if (buffer->nb_overflows > 1){
-    	ringbuffer_dma_reset(buffer, size);
+    	ringbuffer_dma_reset(buffer, dma_index);
     	printf("B\n\r");
     } else if (buffer->nb_overflows < 0) {
         // Here ringbuffer_dma_add_overflow has not yet been called but buffer->start has go back to 0
-        if (size < buffer->start) {
+        if (dma_index < buffer->start) {
             // ERROR! (ringbuffer_dma_add_overflow has never been called)
         	printf("WTF DMA ERROOOOR\n\r");
         } else {
-            buffer->size = size - buffer->start;
+            buffer->size = dma_index - buffer->start;
         }
     } else {
-        if (size < buffer->start) {
+        if (dma_index < buffer->start) {
             // Here an overfow has occured but ringbuffer_dma_add_overflow has not yet been called
-            buffer->size = buffer->max_size - buffer->start + size;
+            buffer->size = buffer->max_size - buffer->start + dma_index;
         } else {
-            buffer->size = size - buffer->start;
+            buffer->size = dma_index - buffer->start;
         }
     }
 }
@@ -89,7 +91,9 @@ uint32_t ringbuffer_read(ringbuffer_t* buffer, uint8_t *data, uint32_t max_size)
         start++;
         if (start >= buffer_max_size) {
             start = 0;
+        	__disable_irq();
             buffer->nb_overflows--;
+            __enable_irq();
         }
     }
 
