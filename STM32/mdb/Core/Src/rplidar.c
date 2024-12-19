@@ -22,6 +22,7 @@ void new_req(UART_HandleTypeDef *huart, const uint8_t cmd) {
 	}
 	HAL_UART_Transmit(huart, (uint8_t *)&req_struct, sizeof(req_struct), 100);
 }
+
 void start_scan(UART_HandleTypeDef *huart, descriptor *res_desc) {
 	new_req(huart, SCAN);
 	get_res_descriptor(huart, (uint8_t *)res_desc);

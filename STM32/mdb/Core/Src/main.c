@@ -251,6 +251,9 @@ int main(void)
 //		  }
 		  if (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin) == GPIO_PIN_RESET) {
 			  printf("%s\n\r", off);
+			  scan_request.start_flag = START_FLAG1;
+			  scan_request.command = STOP;
+			  HAL_UART_Transmit(&huart1, (uint8_t *)&scan_request, sizeof(scan_request), 100);
 			  HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_RESET);
 			  stop(&huart1);
 			  state_lidar = STANDBY;
