@@ -6,7 +6,7 @@
 
   (title_block
     (title "Carte MDB")
-    (date "2024-11-05")
+    (date "2025-01-02")
     (rev "V5.0")
   )
 
@@ -2020,6 +2020,67 @@
         (pin input line (at -7.62 0 0) (length 2.54)
           (name "DIN" (effects (font (size 1.27 1.27))))
           (number "4" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+    (symbol "MarkingEvo:CAN_ID_lable" (in_bom no) (on_board yes)
+      (property "Reference" "LB" (at 0 -2.54 0)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property "Value" "" (at 0 0 0)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property "Footprint" "MarkingEvo:CAN ID lablel" (at 0 -5.08 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property "Datasheet" "" (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (symbol "CAN_ID_lable_0_1"
+        (arc (start -2.54 1.27) (mid -3.7942 0) (end -2.54 -1.27)
+          (stroke (width 0) (type default))
+          (fill (type none))
+        )
+        (polyline
+          (pts
+            (xy -2.54 -1.27)
+            (xy 0 -1.27)
+          )
+          (stroke (width 0) (type default))
+          (fill (type none))
+        )
+        (polyline
+          (pts
+            (xy -2.54 1.27)
+            (xy 0 1.27)
+          )
+          (stroke (width 0) (type default))
+          (fill (type none))
+        )
+        (polyline
+          (pts
+            (xy 0 -1.27)
+            (xy 2.54 -1.27)
+          )
+          (stroke (width 0) (type default))
+          (fill (type none))
+        )
+        (polyline
+          (pts
+            (xy 0 1.27)
+            (xy 2.54 1.27)
+          )
+          (stroke (width 0) (type default))
+          (fill (type none))
+        )
+        (arc (start 2.5559 -1.27) (mid 3.8101 0) (end 2.5559 1.27)
+          (stroke (width 0) (type default))
+          (fill (type none))
+        )
+      )
+      (symbol "CAN_ID_lable_1_1"
+        (text "CAN ID" (at 0 0 0)
+          (effects (font (size 1.27 1.27)))
         )
       )
     )
@@ -6016,6 +6077,13 @@
     (effects (font (size 1.27 1.27)) (justify left top))
     (uuid be083c34-9c51-483a-8b3e-c5bd5b169b6f)
   )
+  (text_box "Marking"
+    (at 12.7 166.37 0) (size 34.29 30.48)
+    (stroke (width 0) (type dash))
+    (fill (type none))
+    (effects (font (size 1.27 1.27)) (justify left top))
+    (uuid c8510ee9-b226-4767-b20c-807a38bd885a)
+  )
   (text_box "Bus Evo"
     (at 12.7 12.7 0) (size 57.15 31.75)
     (stroke (width 0) (type dash))
@@ -8450,6 +8518,30 @@
       (project "V5"
         (path "/e37b1e14-88a9-4b1f-9cc8-b3212305ea1b"
           (reference "C6") (unit 1)
+        )
+      )
+    )
+  )
+
+  (symbol (lib_id "MarkingEvo:CAN_ID_lable") (at 27.94 173.99 0) (unit 1)
+    (in_bom no) (on_board yes) (dnp no) (fields_autoplaced)
+    (uuid f02b3fab-ed8d-4654-b823-3c1a6aaef38c)
+    (property "Reference" "LB1" (at 33.02 173.99 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Value" "~" (at 27.94 173.99 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property "Footprint" "MarkingEvo:CAN ID lablel" (at 27.94 179.07 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "" (at 27.94 173.99 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (instances
+      (project "V5"
+        (path "/e37b1e14-88a9-4b1f-9cc8-b3212305ea1b"
+          (reference "LB1") (unit 1)
         )
       )
     )
