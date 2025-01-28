@@ -21,7 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include "rplidar.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -115,6 +116,10 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, 0);
+
+  enum state_scan state_lidar = STANDBY;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -124,6 +129,66 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	if (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin) != GPIO_PIN_RESET) {
+		switch (state_lidar) {
+		case STANDBY:
+			// Start Lidar rotation (PWM pin -> on)
+			printf("on\n\r");
+			HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_SET);
+
+			state_lidar = REQUEST;
+			break;
+
+		case REQUEST:
+			// Request
+			printf("req\n\r");
+			new_req(&huart1, SCAN);
+
+			state_lidar = DESCRIPTOR;
+			break;
+
+		case DESCRIPTOR:
+			// Read descriptor
+			printf("desc\n\r");
+
+			state_lidar = SCANNING;
+
+			break;
+
+		case SCANNING:
+			printf("scan\n\r");
+
+			break;
+
+		default:
+			printf("error\n\r");
+			state_lidar = UART_ERROR;
+
+			break;
+		}
+
+		  // start scanning
+	//		  scan_data res_data;
+	//		  HAL_Delay(500);
+	//
+	//		  while (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin)) {
+	//			  get_res_data(&huart1, (uint8_t *)&res_data, &res_desc);
+	//			  HAL_Delay(100);
+	//			  HAL_UART_Transmit(&huart2, (uint8_t *)&res_data, (uint16_t)sizeof(res_data), 500);
+	//			  HAL_Delay(100);
+	//			  HAL_UART_Transmit(&huart2, (uint8_t *)"\n\r", 2, 500);
+	//			  HAL_Delay(100);
+	//		  }
+		  if (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin) == GPIO_PIN_RESET) {
+			  printf("%s\n\r", off);
+			  scan_request.start_flag = START_FLAG1;
+			  scan_request.command = STOP;
+			  HAL_UART_Transmit(&huart1, (uint8_t *)&scan_request, sizeof(scan_request), 100);
+			  HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_RESET);
+			  stop(&huart1);
+			  state_lidar = STANDBY;
+		  }
+	  }
   }
   /* USER CODE END 3 */
 }
