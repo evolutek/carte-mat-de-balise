@@ -120,7 +120,6 @@ int main(void)
 
   enum state_scan state_lidar = STANDBY;
   descriptor desc_res = {0};
-  scan_data sample[2048];
 
   /* USER CODE END 2 */
 
@@ -146,7 +145,7 @@ int main(void)
 
 		case REQUEST:
 			// Request
-			new_req(&huart1, SCAN);
+			desc_res = new_req(&huart1, SCAN);
 
 			state_lidar = DESCRIPTOR;
 			printf("desc\n\r");
@@ -154,9 +153,6 @@ int main(void)
 
 		case DESCRIPTOR:
 			// Read descriptor
-			uint8_t help[7] = {0};
-			HAL_UART_Receive(&huart1, (uint8_t*) &help, sizeof(desc_res), 5000);
-
 			if (desc_res.start_flag1 != START_FLAG1)
 				state_lidar = UART_ERROR;
 			else if (desc_res.start_flag2 != START_FLAG2)
@@ -169,11 +165,15 @@ int main(void)
 				state_lidar = SCANNING; // Everything fine !
 				printf("scan\n\r");
 			}
-
 			break;
 
 		case SCANNING:
+			scan_data sample[2048];
 
+			do {
+
+			} while ()
+			printf("ici\n\r");
 			break;
 
 		default:

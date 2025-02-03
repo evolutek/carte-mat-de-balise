@@ -113,7 +113,7 @@ typedef struct Lidar_conf_Data {
 
 /**************************** FUNCTIONS PROTOTYPES ****************************/
 /* Request -------------------------------------------------------------------*/
-void new_req(UART_HandleTypeDef *huart, const uint8_t cmd); // TODO #1
+descriptor new_req(UART_HandleTypeDef *huart, const uint8_t cmd); // TODO #1
 void start_scan(UART_HandleTypeDef *huart, descriptor *res_desc);
 void start_force_scan(UART_HandleTypeDef *huart, descriptor *res_desc);
 void start_express_scan(UART_HandleTypeDef *huart, const uint8_t payload, descriptor *res_desc); // TODO #1

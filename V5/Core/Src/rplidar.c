@@ -12,14 +12,17 @@
 #include <string.h>
 
 /* Request -------------------------------------------------------------------*/
-void new_req(UART_HandleTypeDef *huart, const uint8_t cmd) {
+descriptor new_req(UART_HandleTypeDef *huart, const uint8_t cmd) {
 	request req_struct;
+	descriptor desc_res;
 	req_struct.start_flag = START_FLAG1;
 	req_struct.command = cmd;
 	if (cmd > 0x80) {
 		//todo
 	}
 	HAL_UART_Transmit(huart, (uint8_t *)&req_struct, sizeof(req_struct), 100);
+	HAL_UART_Receive(huart, (uint8_t *)&desc_res, sizeof(desc_res), 1000);
+	return desc_res;
 }
 
 void start_scan(UART_HandleTypeDef *huart, descriptor *res_desc) {
