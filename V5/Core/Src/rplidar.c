@@ -6,7 +6,6 @@
   * @brief   This file contains everything for the RPLidar of the Evolutek team
   ******************************************************************************
   */
-
 #include "main.h"
 #include "rplidar.h"
 #include <stdio.h>

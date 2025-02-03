@@ -1,0 +1,13 @@
+../Core/Src/rplidar.c:15:6:new_req	1
+../Core/Src/rplidar.c:25:6:start_scan	1
+../Core/Src/rplidar.c:29:6:start_force_scan	1
+../Core/Src/rplidar.c:33:6:start_express_scan	1
+../Core/Src/rplidar.c:39:6:get_res_descriptor	1
+../Core/Src/rplidar.c:42:6:get_res_data	1
+../Core/Src/rplidar.c:49:6:stop	1
+../Core/Src/rplidar.c:52:6:reset	1
+../Core/Src/rplidar.c:65:6:get_single_res	1
+../Core/Src/rplidar.c:74:11:get_info	1
+../Core/Src/rplidar.c:80:13:get_health	1
+../Core/Src/rplidar.c:86:17:get_samplerate	1
+../Core/Src/rplidar.c:93:17:get_lidar_conf	1
