@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 #include "rplidar.h"
+#include "byteswap.h"
 
 /* USER CODE END Includes */
 
@@ -153,14 +154,22 @@ int main(void)
 
 		case DESCRIPTOR:
 			// Read descriptor
-			if (desc_res.start_flag1 != START_FLAG1)
+			if (desc_res.start_flag1 != START_FLAG1) {
 				state_lidar = UART_ERROR;
-			else if (desc_res.start_flag2 != START_FLAG2)
+				printf("error flag 1\n\r");
+			}
+			else if (desc_res.start_flag2 != START_FLAG2) {
 				state_lidar = UART_ERROR;
-			else if (desc_res.res_length_mode != RES_LENGTH_MODE)
+				printf("error flag 2\n\r");
+			}
+			else if (desc_res.res_length_mode != RES_LENGTH_MODE) {
 				state_lidar = UART_ERROR;
-			else if (desc_res.type != DATA_TYPE)
+				printf("error reslength\n\r");
+			}
+			else if (desc_res.type != DATA_TYPE) {
 				state_lidar = UART_ERROR;
+				printf("error type 1\n\r");
+			}
 			else {
 				state_lidar = SCANNING; // Everything fine !
 				printf("scan\n\r");
@@ -168,12 +177,24 @@ int main(void)
 			break;
 
 		case SCANNING:
-			scan_data sample[2048];
+			scan_data sample[2048] = {0};
+			scan_data frame = {0};
+			uint16_t index = 0;
 
 			do {
-
-			} while ()
+				HAL_UART_Receive(&huart1, (uint8_t *)&frame, sizeof(frame), 1000);
+				sample[index++] = frame;
+			} while(!CHECK_BIT(frame.quality, 0));
 			printf("ici\n\r");
+			index = 0;
+			state_lidar = STOPPING;
+			break;
+
+		case STOPPING:
+			stop(&huart1);
+			HAL_Delay(1000);
+			state_lidar = STANDBY;
+
 			break;
 
 		default:
@@ -197,9 +218,8 @@ int main(void)
 		//		  }
 		if (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin) == GPIO_PIN_RESET) {
 			printf("off\n\r");
-			new_req(&huart1, STOP);
-			HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_RESET);
 			stop(&huart1);
+			HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_RESET);
 			state_lidar = STANDBY;
 		}
 	}

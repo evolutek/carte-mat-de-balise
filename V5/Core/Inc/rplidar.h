@@ -41,10 +41,10 @@
 #define DATA_TYPE		0x81
 
 /* MACROS --------------------------------------------------------------------*/
-#define CHECK_BIT(var, pos) (((var) & (1U << (pos))) != 0)
+#define CHECK_BIT(var, pos) ((var >> pos) & (1))
 
 /* State Machines ------------------------------------------------------------*/
-enum state_scan { STANDBY, REQUEST, DESCRIPTOR, SCANNING, UART_ERROR };
+enum state_scan { STANDBY, REQUEST, DESCRIPTOR, SCANNING, STOPPING, UART_ERROR };
 
 
 /* Request packet format -----------------------------------------------------*/
