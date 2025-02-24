@@ -25,9 +25,10 @@ descriptor new_req(UART_HandleTypeDef *huart, const uint8_t cmd) {
 	return desc_res;
 }
 
-void start_scan(UART_HandleTypeDef *huart, descriptor *res_desc) {
+void start_scan(UART_HandleTypeDef *huart, descriptor *res_desc, uint8_t *rx_buffer) {
 	new_req(huart, SCAN);
 	get_res_descriptor(huart, (uint8_t *)res_desc);
+	HAL_UART_Receive_DMA(huart, (uint8_t *)rx_buffer, 256);
 }
 void start_force_scan(UART_HandleTypeDef *huart, descriptor *res_desc) {
 	new_req(huart, FORCE_SCAN);

@@ -60,8 +60,8 @@ all: main-build
 main-build: carte-mdb-v5.elf secondary-outputs
 
 # Tool invocations
-carte-mdb-v5.elf carte-mdb-v5.map: $(OBJS) $(USER_OBJS) /home/lecrabe/dev/Evolutek/CDR/rnd/carte-mat-de-balise/V5/STM32G491KEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "carte-mdb-v5.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/lecrabe/dev/Evolutek/CDR/rnd/carte-mat-de-balise/V5/STM32G491KEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="carte-mdb-v5.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+carte-mdb-v5.elf carte-mdb-v5.map: $(OBJS) $(USER_OBJS) /home/lecrabe/dev/evolutek/carte-mat-de-balise/V5/STM32G491KEUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "carte-mdb-v5.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/lecrabe/dev/evolutek/carte-mat-de-balise/V5/STM32G491KEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="carte-mdb-v5.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
