@@ -39,7 +39,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#define UART_RX_BUFFER_SIZE 2048
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -56,6 +56,12 @@
 
 /* USER CODE BEGIN PV */
 
+// Lidar context definition
+LidarContext lidarCtx;
+
+// Buffer to store retrieved points
+LidarMeasurement pointBuffer[100];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,32 +73,6 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-uint8_t rx_buffer[UART_RX_BUFFER_SIZE] = {0};
-scan_data sample[UART_RX_BUFFER_SIZE * 2] = {0};
-uint8_t half = 0;
-
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
-	if (half == 0) {
-		memcpy(sample, rx_buffer, Size);
-		half = 1;
-	}
-	else {
-		memcpy(sample, rx_buffer + UART_RX_BUFFER_SIZE, Size);
-		half = 0;
-	}
-	HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_buffer, 1024);
-}
-
-void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
-
-}
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rx_buffer, 1024);
-}
-
-enum state_scan state_lidar = STANDBY;
-
 /* USER CODE END 0 */
 
 /**
@@ -103,7 +83,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 //  uint8_t dma_buffer[0] = {0};
-  descriptor desc_res = {0};
+//  descriptor desc_res = {0};
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -134,7 +114,8 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_RESET);
+  // Initialise RPLidar with motor control coordinates
+  LIDAR_Init(&lidarCtx, &huart1, LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin);
 
   /* USER CODE END 2 */
 
@@ -145,91 +126,39 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  if (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin) != GPIO_PIN_RESET) {
+		  // Button activated
+		  if (lidarCtx.state == LIDAR_STATE_STANDBY) {
+			  // Start the lidar if it's in standby
+			  if (LIDAR_Scan(&lidarCtx) != 0) {
+				  printf("Error starting lidar\r\n");
+			  }
+		  }
+	      else if (lidarCtx.state == LIDAR_STATE_SCANNING) {
+	          // Retrieve and process points if lidar is scanning
+	          uint16_t pointCount = LIDAR_GetPoints(&lidarCtx, pointBuffer, 100);
 
-	if (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin) != GPIO_PIN_RESET) {
-		switch (state_lidar) {
-		case STANDBY:
-			// Start Lidar rotation (PWM pin -> on)
-			printf("on\n\r");
-			HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_SET);
-			HAL_Delay(1000);
+	          if (pointCount > 0) {
+	        	  // Process the retrieved points
+	        	  // For example, send them via UART2 or display them
+	        	  printf("Received %d points\r\n", pointCount);
+	        	  // Example: Display the first point
+	        	  printf("Angle: %.2f°, Distance: %.2f mm, Quality: %d\r\n", pointBuffer[0].angle, pointBuffer[0].distance, pointBuffer[0].quality);
+	          }
 
-			state_lidar = REQUEST;
-			printf("req\n\r");
-			break;
+	          // Periodically check lidar health
+	          LIDAR_HealthCheck(&lidarCtx);
+	      }
+	  } else {
+		  // Button deactivated, stop lidar if it was active
+	      if (lidarCtx.state != LIDAR_STATE_STANDBY) {
+	    	  LIDAR_Stop(&lidarCtx);
+	      }
+	  }
 
-		case REQUEST:
-			// Request
-			desc_res = new_req(&huart1, SCAN);
-
-			state_lidar = DESCRIPTOR;
-			printf("desc\n\r");
-			break;
-
-		case DESCRIPTOR:
-			// Read descriptor
-			if (desc_res.start_flag1 != START_FLAG1) {
-				state_lidar = UART_ERROR;
-				printf("error flag 1\n\r");
-			}
-			else if (desc_res.start_flag2 != START_FLAG2) {
-				state_lidar = UART_ERROR;
-				printf("error flag 2\n\r");
-			}
-			else if (desc_res.res_length_mode != RES_LENGTH_MODE) {
-				state_lidar = UART_ERROR;
-				printf("error reslength\n\r");
-			}
-			else if (desc_res.type != DATA_TYPE) {
-				state_lidar = UART_ERROR;
-				printf("error type 1\n\r");
-			}
-			else {
-				state_lidar = SCANNING; // Everything fine !
-				printf("scan\n\r");
-			}
-			break;
-
-		case SCANNING:
-			HAL_UARTEx_ReceiveToIdle_DMA(&huart1, &rx_buffer, UART_RX_BUFFER_SIZE);
-			break;
-	//
-	//		case STOPPING:
-	//			stop(&huart1);
-	//			HAL_Delay(1000);
-	//			state_lidar = STANDBY;
-	//
-	//			break;
-		case UART_ERROR:
-			break;
-
-		default:
-			printf("error\n\r");
-			state_lidar = ERROR;
-
-			break;
-		}
-
-		// start scanning
-		//		  scan_data res_data;
-		//		  HAL_Delay(500);
-		//
-		//		  while (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin)) {
-		//			  get_res_data(&huart1, (uint8_t *)&res_data, &res_desc);
-		//			  HAL_Delay(100);
-		//			  HAL_UART_Transmit(&huart2, (uint8_t *)&res_data, (uint16_t)sizeof(res_data), 500);
-		//			  HAL_Delay(100);
-		//			  HAL_UART_Transmit(&huart2, (uint8_t *)"\n\r", 2, 500);
-		//			  HAL_Delay(100);
-		//		  }
-		if (HAL_GPIO_ReadPin(AU_GPIO_Port, AU_Pin) == GPIO_PIN_RESET) {
-			printf("off\n\r");
-			stop(&huart1);
-			HAL_GPIO_WritePin(LIDAR_PWM_GPIO_Port, LIDAR_PWM_Pin, GPIO_PIN_RESET);
-			state_lidar = STANDBY;
-		}
-	}
+	  HAL_Delay(10); // Small delay to avoid overloading the processor
   }
+
   /* USER CODE END 3 */
 }
 
@@ -281,6 +210,22 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == USART1) {
+    // Redirect to the LIDAR handler
+	  LIDAR_DMA_Callback(huart, 0);
+  }
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == USART1) {
+    // Redirect to the LIDAR handler
+	  LIDAR_DMA_Callback(huart, 1);
+  }
+}
 
 /* USER CODE END 4 */
 
