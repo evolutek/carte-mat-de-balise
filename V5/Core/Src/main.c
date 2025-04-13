@@ -59,9 +59,6 @@
 // Lidar context definition
 LidarContext lidarCtx;
 
-// Buffer to store retrieved points
-LidarMeasurement pointBuffer[100];
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -136,18 +133,18 @@ int main(void)
 		  }
 	      else if (lidarCtx.state == LIDAR_STATE_SCANNING) {
 	          // Retrieve and process points if lidar is scanning
-	          uint16_t pointCount = LIDAR_GetPoints(&lidarCtx, pointBuffer, 100);
+//	          uint16_t pointCount = LIDAR_GetPoints(&lidarCtx, pointBuffer, 100);
 
-	          if (pointCount > 0) {
+//	          if (pointCount > 0) {
 	        	  // Process the retrieved points
 	        	  // For example, send them via UART2 or display them
-	        	  printf("Received %d points\r\n", pointCount);
+//	        	  printf("Received %d points\r\n", pointCount);
 	        	  // Example: Display the first point
-	        	  printf("Angle: %.2f°, Distance: %.2f mm, Quality: %d\r\n", pointBuffer[0].angle, pointBuffer[0].distance, pointBuffer[0].quality);
-	          }
+//	        	  printf("Angle: %.2f°, Distance: %.2f mm, Quality: %d\r\n", pointBuffer[0].angle, pointBuffer[0].distance, pointBuffer[0].quality);
+//	          }
 
 	          // Periodically check lidar health
-	          LIDAR_HealthCheck(&lidarCtx);
+//	          LIDAR_HealthCheck(&lidarCtx);
 	      }
 	  } else {
 		  // Button deactivated, stop lidar if it was active
@@ -213,18 +210,12 @@ void SystemClock_Config(void)
 
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
-  if (huart->Instance == USART1) {
-    // Redirect to the LIDAR handler
-	  LIDAR_DMA_Callback(huart, 0);
-  }
+  LIDAR_GetDMAScanData(&lidarCtx, 0);
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  if (huart->Instance == USART1) {
-    // Redirect to the LIDAR handler
-	  LIDAR_DMA_Callback(huart, 1);
-  }
+  LIDAR_GetDMAScanData(&lidarCtx, 1);
 }
 
 /* USER CODE END 4 */

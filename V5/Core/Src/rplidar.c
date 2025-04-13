@@ -35,10 +35,12 @@ void LIDAR_Init(LidarContext *ctx, UART_HandleTypeDef *uart, GPIO_TypeDef *motor
   ctx->state = LIDAR_STATE_STANDBY;
   ctx->head = 0;
   ctx->tail = 0;
-  ctx->receivingDescriptor = 0;
-  ctx->dmaTransferComplete = 0;
+  ctx->scanPoints = 0;
+  ctx->format = 0;
+  ctx->newScanStarted = 0;
+  ctx->start_angle_q6 = 0;
+  ctx->prev_angle_q6 = 0;
   ctx->lastPacketTime = 0;
-  ctx->packetCount = 0;
   ctx->errorCount = 0;
 
   // Motor off by default
@@ -109,16 +111,14 @@ HAL_StatusTypeDef LIDAR_SendCommand(LidarContext *ctx, uint8_t cmd, uint8_t* pay
  */
 static uint8_t LIDAR_WaitResponseDescriptor(LidarContext *ctx)
 {
-  ctx->receivingDescriptor = 1;
+  ctx->state = LIDAR_STATE_DESCRIPTOR;
 
   // Receive response descriptor
-  if (HAL_UART_Receive(ctx->uart, (uint8_t *)&ctx->responseDescriptor, sizeof(descriptor), 1000) != HAL_OK) {
-    ctx->receivingDescriptor = 0;
+  if (HAL_UART_Receive(ctx->uart, (uint8_t *)&ctx->responseDescriptor, RPLIDAR_DESCRIPTOR_PACKET_SIZE, 1000) != HAL_OK) {
+    ctx->state = LIDAR_STATE_ERROR;
     ctx->errorCount++;
     return 1;  // Reception error
   }
-
-  ctx->receivingDescriptor = 0;
 
   // Check if reception is valid
   if (ctx->responseDescriptor.start_flag1 != START_FLAG1 ||
@@ -188,7 +188,7 @@ uint8_t LIDAR_Scan(LidarContext *ctx)
   }
 
   // Start DMA reception
-  HAL_UART_Receive_DMA(ctx->uart, ctx->dataPacket, sizeof(ctx->dataPacket));
+  HAL_UART_Receive_DMA(ctx->uart, ctx->dmaBuffer, sizeof(ctx->dmaBuffer));
 
   ctx->state = LIDAR_STATE_SCANNING;
   ctx->lastPacketTime = HAL_GetTick();
@@ -233,9 +233,9 @@ uint8_t LIDAR_ExpressScan(LidarContext *ctx, uint8_t mode)
 
    // Start DMA reception
    if (mode == 0) {
-	   HAL_UART_Receive_DMA(ctx->uart, ctx->dataPacket, RPLIDAR_LEGACY_PACKET_SIZE);
+	   HAL_UART_Receive_DMA(ctx->uart, ctx->dmaBuffer, RPLIDAR_LEGACY_PACKET_SIZE);
    } else {
-	   HAL_UART_Receive_DMA(ctx->uart, ctx->dataPacket, RPLIDAR_EXTENDED_PACKET_SIZE);
+	   HAL_UART_Receive_DMA(ctx->uart, ctx->dmaBuffer, RPLIDAR_EXTENDED_PACKET_SIZE);
    }
 
    ctx->state = LIDAR_STATE_SCANNING;
@@ -275,7 +275,7 @@ uint8_t LIDAR_Info(LidarContext *ctx)
 	  }
 
 	  // Start DMA reception
-	  HAL_UART_Receive_DMA(ctx->uart, ctx->dataPacket, 20);
+	  HAL_UART_Receive_DMA(ctx->uart, ctx->dmaBuffer, 20);
 
 	  ctx->state = LIDAR_STATE_SCANNING;
 	  ctx->lastPacketTime = HAL_GetTick();
@@ -314,7 +314,7 @@ uint8_t LIDAR_Health(LidarContext *ctx)
 	  }
 
 	  // Start DMA reception
-	  HAL_UART_Receive_DMA(ctx->uart, ctx->dataPacket, 3);
+	  HAL_UART_Receive_DMA(ctx->uart, ctx->dmaBuffer, 3);
 
 	  ctx->state = LIDAR_STATE_SCANNING;
 	  ctx->lastPacketTime = HAL_GetTick();
@@ -395,7 +395,7 @@ uint8_t LIDAR_Conf(LidarContext *ctx, uint32_t type)
     }
 
     // Receive the response data
-    if (HAL_UART_Receive(ctx->uart, ctx->dataPacket, responseSize, 1000) != HAL_OK) {
+    if (HAL_UART_Receive(ctx->uart, ctx->dmaBuffer, responseSize, 1000) != HAL_OK) {
         ctx->state = LIDAR_STATE_ERROR;
         printf("Error receiving configuration data\r\n");
         return 1;
@@ -417,46 +417,46 @@ void LIDAR_ProcessPacket(LidarContext *ctx, uint8_t cplt)
     return;
   }
 
-  // Update packet counter and timestamp
-  ctx->packetCount++;
+//  // Update packet counter and timestamp
+//  ctx->packetCount++;
   ctx->lastPacketTime = HAL_GetTick();
 
-  scan_data *data = (scan_data*)ctx->dataPacket[cplt];
+//  scan_data *data = (scan_data*)ctx->dmaBuffer[cplt];
 
-  for (int i = 0; i < 5; i++) {  // Process 5 measurements per packet
+//  for (int i = 0; i < 5; i++) {  // Process 5 measurements per packet
     // Extract information
-    uint8_t quality = data[i].quality & 0x3F;  // 6 lower bits
-    float angle = (float)data[i].angle_q6 / 64.0f;
-    float distance = (float)data[i].distance_q2 / 4.0f;
+//    uint8_t quality = data[i].quality & 0x3F;  // 6 lower bits
+//    float angle = (float)data[i].angle_q6 / 64.0f;
+//    float distance = (float)data[i].distance_q2 / 4.0f;
 
     // Check if it's the beginning of a new turn
-    uint8_t startBit = 0;
-    if (i == 0 && ctx->prev_start_angle_q6 > data[i].angle_q6 &&
-        ctx->prev_start_angle_q6 - data[i].angle_q6 > 3000) {
-      startBit = 1;  // Transition from ~360° to ~0°
-    }
-    ctx->prev_start_angle_q6 = data[i].angle_q6;
+//    uint8_t startBit = 0;
+//    if (i == 0 && ctx->start_angle_q6 > data[i].angle_q6 &&
+//        ctx->start_angle_q6 - data[i].angle_q6 > 3000) {
+//      startBit = 1;  // Transition from ~360° to ~0°
+//    }
+//    ctx->prev_angle_q6 = data[i].angle_q6;
 
     // If quality is valid
-    if (quality > 0 && distance > 0) {
+//    if (quality > 0 && distance > 0) {
       // Store measurement in circular buffer
-      ctx->points[ctx->head].quality = quality;
-      ctx->points[ctx->head].angle = angle;
-      ctx->points[ctx->head].distance = distance;
-      ctx->points[ctx->head].startBit = startBit;
+//      ctx->scanData[ctx->head].quality = quality;
+//      ctx->scanData[ctx->head].angle_q6 = angle;
+//      ctx->scanData[ctx->head].distance_q2 = distance;
+//      ctx->scanData[ctx->head].startBit = startBit;
 
       // Advance the head of the circular buffer
-      ctx->head = (ctx->head + 1) % LIDAR_BUFFER_SIZE;
+//      ctx->head = (ctx->head + 1) % LIDAR_CIRCULAR_BUFFER_SIZE;
 
       // If buffer is full, also advance the tail
-      if (ctx->head == ctx->tail) {
-        ctx->tail = (ctx->tail + 1) % LIDAR_BUFFER_SIZE;
-      }
-    }
-  }
+//      if (ctx->head == ctx->tail) {
+//        ctx->tail = (ctx->tail + 1) % LIDAR_CIRCULAR_BUFFER_SIZE;
+//      }
+//    }
+//  }
 
   // Restart DMA reception for the next packet
-  HAL_UART_Receive_DMA(ctx->uart, (uint8_t *)ctx->dataPacket, sizeof(scan_data) * 5);
+//  HAL_UART_Receive_DMA(ctx->uart, (uint8_t *)ctx->dmaBuffer, sizeof(scan_data) * 5);
 }
 
 /**
@@ -469,9 +469,7 @@ void LIDAR_DMA_Callback(UART_HandleTypeDef *huart, uint8_t cplt)
 {
   if (activeLidarContext != NULL && huart == activeLidarContext->uart) {
     if (activeLidarContext->state == LIDAR_STATE_SCANNING) {
-      activeLidarContext->dmaTransferComplete = 1;
       LIDAR_ProcessPacket(activeLidarContext, cplt);
-      activeLidarContext->dmaTransferComplete = 0;
     }
   }
 }
@@ -483,7 +481,7 @@ void LIDAR_DMA_Callback(UART_HandleTypeDef *huart, uint8_t cplt)
  * @param maxPoints Maximum number of points to retrieve
  * @return Number of points actually retrieved
  */
-uint16_t LIDAR_GetPoints(LidarContext *ctx, LidarMeasurement *points, uint16_t maxPoints)
+uint16_t LIDAR_GetPoints(LidarContext *ctx, scan_data *points, uint16_t maxPoints)
 {
   if (ctx->state != LIDAR_STATE_SCANNING) {
     return 0;
@@ -496,8 +494,8 @@ uint16_t LIDAR_GetPoints(LidarContext *ctx, LidarMeasurement *points, uint16_t m
   uint16_t localTail = ctx->tail;
 
   while (localTail != ctx->head && count < maxPoints) {
-    points[count] = ctx->points[localTail];
-    localTail = (localTail + 1) % LIDAR_BUFFER_SIZE;
+    points[count] = ctx->scanData[localTail];
+    localTail = (localTail + 1) % LIDAR_CIRCULAR_BUFFER_SIZE;
     count++;
   }
 
@@ -521,8 +519,7 @@ uint8_t LIDAR_HealthCheck(LidarContext *ctx)
 
   // If no packet has been received for 1 second and lidar is supposed to be scanning
   if (ctx->state == LIDAR_STATE_SCANNING &&
-      (currentTime - ctx->lastPacketTime) > 1000 &&
-      !ctx->dmaTransferComplete) {
+      (currentTime - ctx->lastPacketTime) > 1000) {
 
     ctx->errorCount++;
     printf("Health check: no packet received for 1s\r\n");
@@ -531,12 +528,48 @@ uint8_t LIDAR_HealthCheck(LidarContext *ctx)
     LIDAR_Stop(ctx);
     HAL_Delay(100);
 
-    if (LIDAR_Scan(ctx) == 0) {
-      return 2;  // Recovery successful
-    } else {
+    if (LIDAR_Scan(ctx) != 0) {
       return 1;  // Persistent error
     }
   }
 
   return 0;  // All good
+}
+
+/**
+ * @brief Extract scan_data from the DMA buffer to the scanData buffer
+ * @param ctx RPLidar context
+ * @return Extract status: 0 = OK, 1 = Error
+ */
+uint8_t LIDAR_GetDMAScanData(LidarContext *ctx, uint8_t fullCplt) {
+	// Temporarily disable interrupts to protect buffer access
+	__disable_irq();
+
+	uint8_t tmp[RPLIDAR_SCAN_PACKET_SIZE];
+	uint16_t sizeOfHalfDMABuf = sizeof(ctx->dmaBuffer) >> 1; // /2
+
+	for (uint16_t i = 0; i < sizeOfHalfDMABuf; i += 5) {
+		memcpy(&tmp, &ctx->dmaBuffer[i + (fullCplt * sizeOfHalfDMABuf)], RPLIDAR_SCAN_PACKET_SIZE);
+
+		// Check S, S' and C bits
+		if ((CHECK_BIT(tmp[0], 0) == !CHECK_BIT(tmp[0], 1)) && CHECK_BIT(tmp[1], 0)) {
+			scan_data newScan;
+
+			newScan.quality = (tmp[0] >> 2);
+			newScan.new_round = (CHECK_BIT(tmp[0], 0)) ? 1 : 0;
+			newScan.angle_q6 = (tmp[2] << 8 | tmp[1] >> 1) >> 6; // /64
+			newScan.distance_q2 = (tmp[4] << 8 | tmp[3]) >> 2; // /4
+
+			ctx->scanData[ctx->head] = newScan;
+			(ctx->head == LIDAR_CIRCULAR_BUFFER_SIZE - 1) ? ctx->head = 0 : ctx->head++ ;
+		} else {
+			__enable_irq();
+			return 1;
+		}
+	}
+
+	// Re-enable interrupts
+	__enable_irq();
+
+	return 0;
 }

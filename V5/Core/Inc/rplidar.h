@@ -46,6 +46,7 @@
 #define RPLIDAR_ANS_FORMAT_DENSE    0x85
 
 /* Packets size --------------------------------------------------------------*/
+#define RPLIDAR_DESCRIPTOR_PACKET_SIZE 	7
 #define RPLIDAR_SCAN_PACKET_SIZE 		5
 #define RPLIDAR_LEGACY_PACKET_SIZE  	84
 #define RPLIDAR_EXTENDED_PACKET_SIZE 	132
@@ -60,7 +61,10 @@
 #define LIDAR_CONF_SCAN_MODE_NAME			0x0000007F  // Get user friendly scan mode
 
 /* Buffer size ---------------------------------------------------------------*/
-#define LIDAR_BUFFER_SIZE   720     // Circular buffer positions
+#define RPLIDAR_MAX_SAMPLES 		512  								// Typical max points per full scan
+#define LIDAR_CIRCULAR_BUFFER_SIZE 	512 								// Circular buffer size (power of 2 for efficient wraparound)
+#define DMA_BUFFER_SIZE				(2 * LIDAR_CIRCULAR_BUFFER_SIZE)	// DMA buffer size
+#define LIDAR_COMPLETE_SCAN_SIZE	512  								// Typical number of points in a complete 360° scan
 
 /* MACROS --------------------------------------------------------------------*/
 #define CHECK_BIT(var, pos) ((var >> pos) & (1))
@@ -81,10 +85,11 @@ typedef struct {
 
 /* Response data packet format -----------------------------------------------*/
 typedef struct {
-    uint8_t quality;        // Reflected laser pulse strength
     uint16_t angle_q6;      // In ° (angle_q6/64.0 ° ?)
     uint16_t distance_q2;   // In mm (distance_q2/4.0 mm ?)
-} __attribute__((__packed__)) scan_data;
+    uint8_t quality;        // Reflected laser pulse strength
+    uint8_t new_round;
+} scan_data;
 
 typedef struct {
     uint16_t quantity;      // Number of measure
@@ -145,14 +150,6 @@ typedef enum {
     LIDAR_STATE_ERROR
 } LidarState;
 
-/* Processed measurement -----------------------------------------------------*/
-typedef struct {
-    uint8_t quality;        // quality
-    float angle;            // angle °
-    float distance;         // distance mm
-    uint8_t startBit;       // new scan (1 = start)
-} LidarMeasurement;
-
 /* LiDAR context -------------------------------------------------------------*/
 typedef struct {
     // hardware peripherals
@@ -163,25 +160,31 @@ typedef struct {
     // LiDAR state
     LidarState state;
 
-    // Reception buffer
-    descriptor responseDescriptor;
-    uint8_t dataPacket[1000 * RPLIDAR_SCAN_PACKET_SIZE];
+    // Reception buffer for DMA
+    uint8_t dmaBuffer[DMA_BUFFER_SIZE * RPLIDAR_SCAN_PACKET_SIZE];
+//    volatile uint16_t dmaHead;
+//    volatile uint16_t dmaTail;
 
-    // Circular buffer for processed points
-    LidarMeasurement points[LIDAR_BUFFER_SIZE];
+    descriptor responseDescriptor;
+
+    // Circular buffer for processed measurements
+    scan_data scanData[LIDAR_CIRCULAR_BUFFER_SIZE];
     volatile uint16_t head;
     volatile uint16_t tail;
 
-    // Decoding informations
-    uint8_t format;
-    uint16_t start_angle_q6;
-    uint16_t prev_start_angle_q6;
+    // Circular buffer for processed measurements
+    scan_data completeScan[LIDAR_COMPLETE_SCAN_SIZE];
+    uint16_t scanPoints;
+    volatile uint8_t scanComplete;
 
-    // Flags and counters
-    volatile uint8_t receivingDescriptor;
-    volatile uint8_t dmaTransferComplete;
+    // Scan decoding parameters
+    uint8_t format;
+    uint8_t newScanStarted;
+    uint16_t start_angle_q6;
+    uint16_t prev_angle_q6;
+
+    // Status flags and diagnostics
     volatile uint32_t lastPacketTime;
-    volatile uint32_t packetCount;
     volatile uint32_t errorCount;
 } LidarContext;
 /******************************* CONTEXT FIELDS *******************************/
@@ -203,8 +206,9 @@ uint8_t LIDAR_Conf(LidarContext *ctx, uint32_t type);
 uint8_t LIDAR_HealthCheck(LidarContext *ctx);
 
 // Receiving and processing
+uint8_t LIDAR_GetDMAScanData(LidarContext *ctx, uint8_t fullCplt);
 void LIDAR_ProcessPacket(LidarContext *ctx, uint8_t cplt);
-uint16_t LIDAR_GetPoints(LidarContext *ctx, LidarMeasurement *points, uint16_t maxPoints);
+uint16_t LIDAR_GetPoints(LidarContext *ctx, scan_data *points, uint16_t maxPoints);
 void LIDAR_DMA_Callback(UART_HandleTypeDef *huart, uint8_t cplt);
 
 // Compatibility with existing code
