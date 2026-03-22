@@ -610,6 +610,238 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "ComponentsEvo:MCP2561FD-E-SN"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at -10.16 8.89 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "MCP2561FD-E-SN"
+				(at 2.54 8.89 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+				(at 0 -12.7 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+						(italic yes)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ProductDocuments/DataSheets/20005284A.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "High-Speed CAN FD Transceiver, 8Mbps, 5V supply, SPLIT pin, -40C to +125C, SOIC-8"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "High-Speed CAN FD Transceiver"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "SOIC*3.9x4.9mm*P1.27mm*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "MCP2561FD-E-SN_0_1"
+				(rectangle
+					(start -10.16 7.62)
+					(end 10.16 -7.62)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "MCP2561FD-E-SN_1_1"
+				(pin input line
+					(at -12.7 5.08 0)
+					(length 2.54)
+					(name "TXD"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at -12.7 2.54 0)
+					(length 2.54)
+					(name "RXD"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -12.7 -5.08 0)
+					(length 2.54)
+					(name "STBY"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 10.16 270)
+					(length 2.54)
+					(name "VDD"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 -10.16 90)
+					(length 2.54)
+					(name "VSS"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 12.7 2.54 180)
+					(length 2.54)
+					(name "CANH"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 12.7 0 180)
+					(length 2.54)
+					(name "SPLIT"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 12.7 -2.54 180)
+					(length 2.54)
+					(name "CANL"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "ComponentsEvo:STM32G491KEUx"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -5055,385 +5287,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Interface_CAN_LIN:MCP2551-I-SN"
-			(pin_names
-				(offset 1.016)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "U"
-				(at -10.16 8.89 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "MCP2551-I-SN"
-				(at 2.54 8.89 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
-				(at 0 -12.7 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-						(italic yes)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "http://ww1.microchip.com/downloads/en/devicedoc/21667d.pdf"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "High-Speed CAN Transceiver, 1Mbps, 5V supply, SOIC-8"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "High-Speed CAN Transceiver"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "SOIC*3.9x4.9mm*P1.27mm*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "MCP2551-I-SN_0_1"
-				(rectangle
-					(start -10.16 7.62)
-					(end 10.16 -7.62)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-			)
-			(symbol "MCP2551-I-SN_1_1"
-				(pin input line
-					(at -12.7 5.08 0)
-					(length 2.54)
-					(name "TXD"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin output line
-					(at -12.7 2.54 0)
-					(length 2.54)
-					(name "RXD"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_out line
-					(at -12.7 -2.54 0)
-					(length 2.54)
-					(name "Vref"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -12.7 -5.08 0)
-					(length 2.54)
-					(name "Rs"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "8"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 0 10.16 270)
-					(length 2.54)
-					(name "VDD"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin power_in line
-					(at 0 -10.16 90)
-					(length 2.54)
-					(name "VSS"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 12.7 2.54 180)
-					(length 2.54)
-					(name "CANH"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "7"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin bidirectional line
-					(at 12.7 -2.54 180)
-					(length 2.54)
-					(name "CANL"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "6"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "Jumper:Jumper_2_Open"
-			(pin_names
-				(offset 0)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "JP"
-				(at 0 2.794 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "Jumper_2_Open"
-				(at 0 -2.286 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Jumper, 2-pole, open"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "Jumper SPST"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "Jumper* TestPoint*2Pads* TestPoint*Bridge*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "Jumper_2_Open_0_0"
-				(circle
-					(center -2.032 0)
-					(radius 0.508)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 2.032 0)
-					(radius 0.508)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "Jumper_2_Open_0_1"
-				(arc
-					(start -1.524 1.27)
-					(mid 0 1.778)
-					(end 1.524 1.27)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "Jumper_2_Open_1_1"
-				(pin passive line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 2.54)
-					(name "B"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Jumper:Jumper_3_Open"
 			(pin_names
 				(offset 0)
@@ -5615,6 +5468,254 @@
 				)
 				(pin passive line
 					(at 6.35 0 180)
+					(length 2.54)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Jumper:SolderJumper_3_Open"
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom no)
+			(on_board yes)
+			(property "Reference" "JP"
+				(at -2.54 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "SolderJumper_3_Open"
+				(at 0 2.794 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Solder Jumper, 3-pole, open"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "Solder Jumper SPDT"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "SolderJumper*Open*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "SolderJumper_3_Open_0_1"
+				(polyline
+					(pts
+						(xy -2.54 0) (xy -2.032 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.016 1.016) (xy -1.016 -1.016)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -1.016 -1.016)
+					(mid -2.0276 0)
+					(end -1.016 1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -1.016 -1.016)
+					(mid -2.0276 0)
+					(end -1.016 1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(rectangle
+					(start -0.508 1.016)
+					(end 0.508 -1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -1.27) (xy 0 -1.016)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 1.016 1.016)
+					(mid 2.0276 0)
+					(end 1.016 -1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 1.016 1.016)
+					(mid 2.0276 0)
+					(end 1.016 -1.016)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.016 1.016) (xy 1.016 -1.016)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 0) (xy 2.032 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "SolderJumper_3_Open_1_1"
+				(pin passive line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 2.54)
+					(name "C"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 0 180)
 					(length 2.54)
 					(name "B"
 						(effects
@@ -11493,9 +11594,9 @@
 			(embedded_fonts no)
 		)
 	)
-	(text "R8 can be used to configure slope control"
+	(text "to enable termination, solder all 3 pads"
 		(exclude_from_sim no)
-		(at 76.962 91.44 0)
+		(at 77.47 92.456 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11896,6 +11997,18 @@
 		(uuid "0cd334fe-f25c-4e8f-aca4-24af8fa1e0b9")
 	)
 	(junction
+		(at 87.63 58.42)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "0dcb6042-3dd9-4155-a27e-02e2bfeed33b")
+	)
+	(junction
+		(at 87.63 88.9)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "0de42615-f4d9-4514-b21f-739c8b377f73")
+	)
+	(junction
 		(at 62.23 53.34)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -11990,12 +12103,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "41bf6311-729d-4194-8c93-0d1863b21c26")
-	)
-	(junction
-		(at 87.63 67.31)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "497ed99d-944c-4398-959f-d6405cd718ff")
 	)
 	(junction
 		(at 110.49 109.22)
@@ -12112,10 +12219,10 @@
 		(uuid "8e8e1b9c-f5e7-405d-b9c2-f7ef1012c013")
 	)
 	(junction
-		(at 123.19 86.36)
+		(at 120.65 86.36)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "94aa2f32-26fe-4d0f-8a77-c0b7d6df686d")
+		(uuid "910361b0-d986-44b5-b93c-d077e06f1b1f")
 	)
 	(junction
 		(at 27.94 66.04)
@@ -12255,19 +12362,9 @@
 		(color 0 0 0 0)
 		(uuid "fbc062e3-7143-4aa0-a481-a1d58d00a671")
 	)
-	(junction
-		(at 87.63 85.09)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "ffe82c39-a879-464b-8304-4d14006ef3b8")
-	)
 	(no_connect
 		(at 30.48 78.74)
 		(uuid "0548f985-e86b-4288-9874-d67baf8e2065")
-	)
-	(no_connect
-		(at 120.65 76.2)
-		(uuid "07e9b431-c2ee-47b0-bb2a-bebe554a77d6")
 	)
 	(no_connect
 		(at 49.53 176.53)
@@ -12332,6 +12429,16 @@
 			(type default)
 		)
 		(uuid "0188b336-7c0a-4b8e-b704-4eba2ded9d9e")
+	)
+	(wire
+		(pts
+			(xy 120.65 78.74) (xy 120.65 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "01b92f47-25d4-4286-9ea7-556ae34dbea9")
 	)
 	(wire
 		(pts
@@ -12605,6 +12712,26 @@
 	)
 	(wire
 		(pts
+			(xy 87.63 58.42) (xy 90.17 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1c8406d9-93bf-47c2-bf1a-cb6a476ce940")
+	)
+	(wire
+		(pts
+			(xy 120.65 86.36) (xy 107.95 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1cbeba19-594c-44e8-9a01-76107bc88248")
+	)
+	(wire
+		(pts
 			(xy 217.17 129.54) (xy 228.6 129.54)
 		)
 		(stroke
@@ -12665,7 +12792,7 @@
 	)
 	(wire
 		(pts
-			(xy 78.74 85.09) (xy 87.63 85.09)
+			(xy 78.74 88.9) (xy 87.63 88.9)
 		)
 		(stroke
 			(width 0)
@@ -12895,7 +13022,7 @@
 	)
 	(wire
 		(pts
-			(xy 90.17 67.31) (xy 90.17 71.12)
+			(xy 90.17 58.42) (xy 90.17 71.12)
 		)
 		(stroke
 			(width 0)
@@ -12982,6 +13109,16 @@
 			(type default)
 		)
 		(uuid "4c6ac592-632e-4968-bc81-a3d3fe6ff613")
+	)
+	(wire
+		(pts
+			(xy 87.63 78.74) (xy 87.63 80.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4e470f28-3436-4461-8682-d5a626a8f5cc")
 	)
 	(wire
 		(pts
@@ -13235,7 +13372,7 @@
 	)
 	(wire
 		(pts
-			(xy 68.58 185.42) (xy 60.96 185.42)
+			(xy 69.85 185.42) (xy 60.96 185.42)
 		)
 		(stroke
 			(width 0)
@@ -13305,7 +13442,7 @@
 	)
 	(wire
 		(pts
-			(xy 87.63 85.09) (xy 90.17 85.09)
+			(xy 87.63 88.9) (xy 90.17 88.9)
 		)
 		(stroke
 			(width 0)
@@ -13352,6 +13489,16 @@
 			(type default)
 		)
 		(uuid "7b52f5b4-9c96-4a21-b9de-2ad94f992fb3")
+	)
+	(wire
+		(pts
+			(xy 91.44 73.66) (xy 95.25 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7caaf184-4e9a-4eeb-8a3d-db01500ddb5b")
 	)
 	(wire
 		(pts
@@ -13402,6 +13549,16 @@
 			(type default)
 		)
 		(uuid "83b2cc91-bcad-41b2-8a08-d9d26162fdd0")
+	)
+	(wire
+		(pts
+			(xy 87.63 59.69) (xy 87.63 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8495e993-f9c3-491e-b355-70a5180b38ba")
 	)
 	(wire
 		(pts
@@ -13495,7 +13652,7 @@
 	)
 	(wire
 		(pts
-			(xy 90.17 85.09) (xy 90.17 76.2)
+			(xy 90.17 88.9) (xy 90.17 76.2)
 		)
 		(stroke
 			(width 0)
@@ -13602,6 +13759,16 @@
 			(type default)
 		)
 		(uuid "9a6f1b07-7a52-4842-be82-7cdedef0431a")
+	)
+	(wire
+		(pts
+			(xy 87.63 87.63) (xy 87.63 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9b2f10ce-6c3d-4dc3-8e38-e2add75a79e5")
 	)
 	(wire
 		(pts
@@ -13782,16 +13949,6 @@
 			(type default)
 		)
 		(uuid "b23c6f04-54df-4bcd-9e70-9c90d6779f32")
-	)
-	(wire
-		(pts
-			(xy 120.65 78.74) (xy 123.19 78.74)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b2cb811d-1e0b-40b2-87e7-df4c30795e20")
 	)
 	(wire
 		(pts
@@ -14215,16 +14372,6 @@
 	)
 	(wire
 		(pts
-			(xy 87.63 67.31) (xy 90.17 67.31)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e43ff50f-4f91-4b47-8027-a34a79779f54")
-	)
-	(wire
-		(pts
 			(xy 71.12 63.5) (xy 60.96 63.5)
 		)
 		(stroke
@@ -14245,7 +14392,17 @@
 	)
 	(wire
 		(pts
-			(xy 78.74 67.31) (xy 87.63 67.31)
+			(xy 87.63 67.31) (xy 87.63 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e6154952-cf93-4545-a0fd-44a44c442240")
+	)
+	(wire
+		(pts
+			(xy 78.74 58.42) (xy 87.63 58.42)
 		)
 		(stroke
 			(width 0)
@@ -14285,7 +14442,7 @@
 	)
 	(wire
 		(pts
-			(xy 123.19 86.36) (xy 107.95 86.36)
+			(xy 123.19 86.36) (xy 120.65 86.36)
 		)
 		(stroke
 			(width 0)
@@ -14375,7 +14532,7 @@
 	)
 	(wire
 		(pts
-			(xy 68.58 189.23) (xy 55.88 189.23)
+			(xy 69.85 189.23) (xy 55.88 189.23)
 		)
 		(stroke
 			(width 0)
@@ -16897,7 +17054,7 @@
 		(uuid "091b9b6e-e108-4130-9c77-29f31a86ed2f")
 	)
 	(label "CANL"
-		(at 78.74 85.09 0)
+		(at 78.74 88.9 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -17057,7 +17214,7 @@
 		(uuid "3bc0ae4d-9ad2-4c59-bb94-01bfcfa03629")
 	)
 	(label "CANH"
-		(at 78.74 67.31 0)
+		(at 78.74 58.42 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -17257,7 +17414,7 @@
 		(uuid "9b08a170-cb7f-49dc-abbd-aea8a7d7de24")
 	)
 	(label "USB_D+"
-		(at 68.58 185.42 180)
+		(at 69.85 189.23 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -17267,7 +17424,7 @@
 		(uuid "a04ad090-66e8-44df-bfc8-9302443d5f7b")
 	)
 	(label "USB_D-"
-		(at 68.58 189.23 180)
+		(at 69.85 185.42 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -17276,7 +17433,7 @@
 		)
 		(uuid "a5bf2bcf-5728-41f2-9ab0-b8de27141123")
 	)
-	(label "D_N"
+	(label "D_P"
 		(at 50.8 165.1 0)
 		(effects
 			(font
@@ -17316,7 +17473,7 @@
 		)
 		(uuid "b23fba01-2ae6-4954-b862-355a12b12f5e")
 	)
-	(label "D_P"
+	(label "D_N"
 		(at 50.8 160.02 0)
 		(effects
 			(font
@@ -17735,7 +17892,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Interface_CAN_LIN:MCP2551-I-SN")
+		(lib_id "ComponentsEvo:MCP2561FD-E-SN")
 		(at 107.95 73.66 0)
 		(mirror y)
 		(unit 1)
@@ -17745,7 +17902,7 @@
 		(dnp no)
 		(uuid "00000000-0000-0000-0000-00005fbd3108")
 		(property "Reference" "U3"
-			(at 117.475 61.595 0)
+			(at 100.076 64.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17753,7 +17910,7 @@
 			)
 		)
 		(property "Value" "MCP2551-I-SN"
-			(at 117.475 64.135 0)
+			(at 116.84 64.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17770,7 +17927,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "http://ww1.microchip.com/downloads/en/devicedoc/21667d.pdf"
+		(property "Datasheet" "https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ProductDocuments/DataSheets/20005284A.pdf"
 			(at 107.95 73.66 0)
 			(effects
 				(font
@@ -17779,12 +17936,13 @@
 				(hide yes)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "High-Speed CAN FD Transceiver, 8Mbps, 5V supply, SPLIT pin, -40C to +125C, SOIC-8"
 			(at 107.95 73.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(pin "1"
@@ -17822,7 +17980,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 87.63 81.28 0)
+		(at 87.63 83.82 0)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -17831,14 +17989,6 @@
 		(dnp no)
 		(uuid "00000000-0000-0000-0000-00005fbd7e72")
 		(property "Reference" "R5"
-			(at 83.82 79.248 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "120"
 			(at 83.82 81.788 0)
 			(effects
 				(font
@@ -17846,8 +17996,16 @@
 				)
 			)
 		)
+		(property "Value" "60"
+			(at 83.82 84.328 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 85.852 81.28 90)
+			(at 85.852 83.82 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17856,7 +18014,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 87.63 81.28 0)
+			(at 87.63 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17865,7 +18023,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 87.63 81.28 0)
+			(at 87.63 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18746,8 +18904,7 @@
 	)
 	(symbol
 		(lib_id "Power_Protection:WE-TVS-82400102")
-		(at 58.42 173.99 270)
-		(mirror x)
+		(at 58.42 173.99 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -18755,7 +18912,7 @@
 		(dnp no)
 		(uuid "127eb477-85e3-4b94-b8be-dd2d8b885906")
 		(property "Reference" "U1"
-			(at 53.086 169.926 90)
+			(at 63.754 169.926 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18763,7 +18920,7 @@
 			)
 		)
 		(property "Value" "WE-TVS-82400102"
-			(at 63.754 171.196 0)
+			(at 53.086 175.768 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18771,7 +18928,7 @@
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-6"
-			(at 53.34 173.99 0)
+			(at 63.5 173.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18780,7 +18937,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.we-online.com/components/products/datasheet/82400102.pdf"
-			(at 52.07 173.99 0)
+			(at 64.77 173.99 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -21052,6 +21209,73 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 87.63 63.5 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "6b04a8a4-bcb9-4976-8460-51211903b293")
+		(property "Reference" "R8"
+			(at 83.82 61.468 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "60"
+			(at 83.82 64.008 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 85.852 63.5 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 87.63 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 87.63 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "326274ce-78d4-4e28-9bc9-c1e5a484e2ac")
+		)
+		(pin "2"
+			(uuid "4a679383-09f1-4581-a208-7fe84892c2e5")
+		)
+		(instances
+			(project "V6"
+				(path "/e37b1e14-88a9-4b1f-9cc8-b3212305ea1b"
+					(reference "R8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:Polyfuse")
 		(at 55.88 146.05 90)
 		(unit 1)
@@ -21580,6 +21804,80 @@
 		)
 	)
 	(symbol
+		(lib_id "Jumper:SolderJumper_3_Open")
+		(at 87.63 73.66 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8be9f18e-d763-47a7-9c5d-a3f3afb07dde")
+		(property "Reference" "JP1"
+			(at 85.09 73.6599 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Jumper_3_Open"
+			(at 85.09 74.9299 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "Jumper:SolderJumper-3_P1.3mm_Open_RoundedPad1.0x1.5mm"
+			(at 87.63 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 87.63 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Solder Jumper, 3-pole, open"
+			(at 87.63 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "dfb17e14-88a9-4050-8ad5-934d661cf046")
+		)
+		(pin "3"
+			(uuid "9d1b83cc-55a1-44e4-b157-c62dedae9dd1")
+		)
+		(pin "1"
+			(uuid "4846b54f-7c90-465f-8d3c-5f1436cfda0f")
+		)
+		(instances
+			(project ""
+				(path "/e37b1e14-88a9-4b1f-9cc8-b3212305ea1b"
+					(reference "JP1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+5V")
 		(at 217.17 21.59 0)
 		(unit 1)
@@ -21780,7 +22078,7 @@
 		(lib_id "MarkingEvo:Logo Aisler")
 		(at 99.06 191.77 0)
 		(unit 1)
-		(exclude_from_sim no)
+		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
@@ -21823,15 +22121,6 @@
 			)
 		)
 		(property "Description" ""
-			(at 99.06 191.77 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Enable" "0"
 			(at 99.06 191.77 0)
 			(effects
 				(font
@@ -23301,7 +23590,7 @@
 		(lib_id "MarkingEvo:Logo Evolutek")
 		(at 99.06 181.61 0)
 		(unit 1)
-		(exclude_from_sim no)
+		(exclude_from_sim yes)
 		(in_bom no)
 		(on_board yes)
 		(dnp no)
@@ -23344,15 +23633,6 @@
 			)
 		)
 		(property "Description" ""
-			(at 99.06 181.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Enable" "0"
 			(at 99.06 181.61 0)
 			(effects
 				(font
@@ -23498,140 +23778,6 @@
 			(project "V5"
 				(path "/e37b1e14-88a9-4b1f-9cc8-b3212305ea1b"
 					(reference "#PWR024")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 123.19 82.55 180)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "ccc09348-83b4-4767-a855-960ba6cd17ce")
-		(property "Reference" "R8"
-			(at 127 81.28 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "0"
-			(at 127 83.82 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 124.968 82.55 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 123.19 82.55 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 123.19 82.55 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "0f9df2d8-4b98-47a6-81a0-c637f2ac4e7b")
-		)
-		(pin "2"
-			(uuid "8fe38c9d-6afb-4175-9196-8121088f23f1")
-		)
-		(instances
-			(project "V5"
-				(path "/e37b1e14-88a9-4b1f-9cc8-b3212305ea1b"
-					(reference "R8")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Jumper:Jumper_2_Open")
-		(at 87.63 72.39 90)
-		(mirror x)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "ce5dbd91-8ebc-4bd4-8093-fd53917c3322")
-		(property "Reference" "JP1"
-			(at 83.82 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "Jumper_2_Open"
-			(at 83.82 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
-			(at 87.63 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 87.63 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 87.63 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "be0fb7a5-5139-4ef8-b08c-1b6426c612e6")
-		)
-		(pin "2"
-			(uuid "53d1a8a9-cf67-4994-aaee-a669c6fb2434")
-		)
-		(instances
-			(project "V5"
-				(path "/e37b1e14-88a9-4b1f-9cc8-b3212305ea1b"
-					(reference "JP1")
 					(unit 1)
 				)
 			)
